@@ -1,0 +1,1372 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lista de Compras</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#F5F4F0;--surface:#FFF;--surface2:#F0EFEB;--border:#E2E0DA;--border2:#D0CEC7;--text:#1A1916;--text2:#6B6860;--text3:#A8A69F;--accent:#1A1916;--accent-fg:#FFF;--green:#1D7A4F;--green-bg:#E8F5EE;--green-border:#c3e6d3;--red:#9B1C1C;--red-bg:#FEF2F2;--red-border:#FECACA;--orange:#854F0B;--orange-bg:#FAF2E5;--orange-border:#F0D68C;--orange-strong:#BA7517;--yellow-bg:#FFF8E1;--radius:10px;--radius-sm:6px;}
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);font-size:16px;color-scheme:light;}
+
+  /* Header comum */
+  .header{background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;}
+  .header-top{display:flex;align-items:center;justify-content:space-between;padding:14px 20px 10px;gap:8px;}
+  .header-title{font-size:20px;font-weight:600;letter-spacing:-.3px;}
+  .header-sub{font-size:13px;color:var(--text3);font-family:'DM Mono',monospace;margin-top:1px;}
+  .btn-pular{padding:6px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:12px;color:var(--text2);cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;}
+  .btn-pular:active{opacity:.7;}
+
+  /* Toggle Por semana / Por categoria */
+  .toggle-vista{padding:0 20px 12px;}
+  .toggle-vista-inner{display:flex;gap:4px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:3px;}
+  .toggle-opt{flex:1;text-align:center;padding:8px 0;font-size:13px;font-weight:500;border-radius:var(--radius-sm);cursor:pointer;color:var(--text3);transition:all .15s;}
+  .toggle-opt.active{background:var(--surface);color:var(--text);box-shadow:0 1px 2px rgba(0,0,0,.05);}
+
+  /* Search */
+  .search-wrap{padding:0 20px 12px;display:flex;gap:8px;}
+  .search-input{flex:1;padding:11px 14px 11px 38px;font-size:16px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);outline:none;font-family:'DM Sans',sans-serif;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23A8A69F' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:13px center;}
+  .search-input::placeholder{color:var(--text3);}
+  .btn-add-new{padding:11px 16px;background:var(--accent);color:var(--accent-fg);border:none;border-radius:var(--radius);font-size:15px;font-weight:600;cursor:pointer;white-space:nowrap;display:none;}
+  .btn-add-new.visible{display:block;}
+
+  .content{padding:14px 20px 200px;}
+
+  /* Banner cardápio ativo (no topo da lista) */
+  .banner-cardapio{background:var(--orange-bg);border-bottom:1px solid var(--orange-border);padding:10px 20px;display:flex;align-items:center;gap:8px;font-size:13px;color:var(--orange);}
+  .banner-cardapio .b-info{flex:1;}
+  .banner-cardapio button{font-size:12px;padding:4px 10px;border:1px solid var(--orange-strong);color:var(--orange-strong);background:transparent;border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;cursor:pointer;}
+
+  /* Cardápio — bloco de semana */
+  .sem-bloco{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px;margin-bottom:10px;}
+  .sem-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+  .sem-label{font-size:11px;font-family:'DM Mono',monospace;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;}
+  .sem-btn{font-size:11px;padding:3px 8px;border:1px solid var(--border2);background:transparent;color:var(--text2);border-radius:4px;font-family:'DM Mono',monospace;cursor:pointer;}
+  .sem-btn:active{opacity:.6;}
+
+  .prato-row{display:flex;align-items:center;gap:10px;padding:9px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:4px;background:var(--surface);cursor:pointer;user-select:none;}
+  .prato-row.selecionado{background:var(--orange-bg);border-color:var(--orange-border);}
+  .prato-row .pr-check{width:16px;height:16px;border:1.5px solid var(--border2);border-radius:4px;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+  .prato-row.selecionado .pr-check{background:var(--orange-strong);border-color:var(--orange-strong);color:#FFF;}
+  .prato-row .pr-nome{flex:1;font-size:14px;}
+  .prato-row.salada .pr-nome{font-size:13px;color:var(--text2);}
+  .prato-row .pr-dif{font-size:10px;font-family:'DM Mono',monospace;color:var(--text3);flex-shrink:0;}
+  .salada-label{font-size:10px;font-family:'DM Mono',monospace;color:var(--text3);margin:6px 4px 4px;}
+
+  /* Categoria (vista por categoria) */
+  .cat-bloco{margin-bottom:18px;}
+  .cat-head{font-size:11px;font-family:'DM Mono',monospace;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;padding-bottom:6px;border-bottom:1px solid var(--border);margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;}
+
+  /* Sugestões mensais */
+  .sug-intro{padding:0 20px 12px;font-size:13px;color:var(--text2);line-height:1.45;}
+  .sug-intro b{font-weight:500;color:var(--text);}
+  .sug-item{display:flex;align-items:center;gap:8px;padding:11px 12px;border:1px solid var(--border);border-radius:var(--radius);margin-bottom:6px;background:var(--surface);}
+  .sug-item .sug-info{flex:1;min-width:0;}
+  .sug-nome{font-size:14px;font-weight:500;}
+  .sug-pratos{font-size:11px;color:var(--text3);margin-top:3px;}
+  .sug-pratos .sug-badge{background:#FAC775;color:#4A1B0C;border-radius:4px;padding:1px 6px;font-family:'DM Mono',monospace;display:inline-block;margin-right:3px;font-size:10px;}
+  .sug-btns{display:flex;gap:4px;flex-shrink:0;}
+  .sug-btn{font-size:11px;padding:6px 10px;border-radius:4px;font-family:'DM Sans',sans-serif;cursor:pointer;border:1px solid var(--border2);background:transparent;color:var(--text2);white-space:nowrap;}
+  .sug-btn.sug-tenho.active{border-color:var(--green);background:var(--green-bg);color:var(--green);}
+  .sug-btn.sug-comprar.active{border-color:var(--red);background:var(--red-bg);color:var(--red);}
+
+  /* Lista — categorias e itens */
+  .cat-block{margin-bottom:24px;}
+  .cat-label{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);font-family:'DM Mono',monospace;padding-bottom:8px;border-bottom:1px solid var(--border);margin-bottom:4px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;user-select:none;}
+  .cat-label:active{opacity:.65;}
+  .fora-block{margin-top:32px;}
+  .fora-label{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-family:'DM Mono',monospace;padding-bottom:6px;border-bottom:2px solid var(--red-border);margin-bottom:6px;color:var(--red);display:flex;justify-content:space-between;align-items:center;cursor:pointer;user-select:none;}
+
+  .item{display:flex;align-items:center;gap:12px;padding:13px 12px;border-radius:var(--radius-sm);cursor:pointer;user-select:none;border:1px solid var(--border);background:var(--surface);margin-bottom:2px;touch-action:pan-y;}
+  .item.from-prato{background:var(--orange-bg);border-color:var(--orange-border);}
+  .item.desmarcado{background:var(--red-bg);border-color:var(--red-border);}
+  .item.pressed{opacity:.7;}
+  .item-name{flex:1;font-size:16px;line-height:1.4;display:flex;flex-direction:column;gap:3px;}
+  .item-name .item-pratos{font-size:10px;font-family:'DM Mono',monospace;}
+  .item-name .item-pratos .pp-badge{background:#FAC775;color:#4A1B0C;border-radius:4px;padding:1px 6px;margin-right:3px;}
+  .item.desmarcado .item-name>span:first-child{color:var(--red);}
+  .badge-novo{font-size:10px;background:#FFF3CD;color:#856404;border-radius:4px;padding:2px 5px;font-family:'DM Mono',monospace;flex-shrink:0;}
+  .qty-wrap{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+  .item.desmarcado .qty-wrap{opacity:0;pointer-events:none;}
+  .qty-btn{width:30px;height:30px;border-radius:50%;border:1px solid var(--border2);background:var(--surface2);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;color:var(--text);flex-shrink:0;}
+  .qty-num{font-size:15px;font-weight:600;min-width:20px;text-align:center;font-family:'DM Mono',monospace;}
+
+  .cat-chevron{font-size:9px;transition:transform .2s;display:inline-block;margin-left:4px;}
+  .cat-chevron.collapsed{transform:rotate(-90deg);}
+
+  /* Footer */
+  .footer{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);padding:10px 12px 80px;}
+  .footer-info{font-size:12px;color:var(--text3);margin-bottom:8px;font-family:'DM Mono',monospace;}
+  .footer-btns{display:flex;gap:6px;}
+  .btn{flex:1;padding:11px 6px;border-radius:var(--radius);font-size:14px;font-weight:500;cursor:pointer;border:none;transition:all .15s;font-family:'DM Sans',sans-serif;white-space:nowrap;min-width:0;}
+  .btn-ghost{background:var(--surface2);border:1px solid var(--border);color:var(--text2);}
+  .btn-primary{background:var(--accent);color:var(--accent-fg);}
+  .btn-primary:active{transform:scale(.98);}
+  .btn-primary:disabled{opacity:.4;cursor:not-allowed;}
+
+  /* Modal */
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;align-items:flex-end;justify-content:center;}
+  .modal-overlay.open{display:flex;}
+  .modal{background:var(--surface);border-radius:16px 16px 0 0;padding:20px 20px 80px;width:100%;max-width:600px;}
+  .modal h3{font-size:17px;font-weight:600;margin-bottom:6px;}
+  .modal p{font-size:14px;color:var(--text2);margin-bottom:14px;line-height:1.5;}
+  .modal textarea{width:100%;height:160px;padding:12px;font-size:14px;font-family:'DM Mono',monospace;border:1px solid var(--border2);border-radius:var(--radius);resize:none;outline:none;background:var(--surface2);color:var(--text);}
+  .modal-btns{display:flex;gap:8px;margin-top:12px;}
+
+  /* Mercado */
+  #tela-mercado{display:none;}
+  .resultado-cat{margin-bottom:20px;}
+  .resultado-cat-title{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);font-family:'DM Mono',monospace;padding-bottom:6px;border-bottom:1px solid var(--border);margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;user-select:none;}
+  .resultado-item{display:flex;align-items:center;padding:13px 12px;border-radius:var(--radius-sm);font-size:16px;border:1px solid var(--border);background:var(--surface);margin-bottom:3px;gap:10px;touch-action:pan-y;cursor:pointer;user-select:none;}
+  .resultado-item.from-prato{background:var(--orange-bg);border-color:var(--orange-border);}
+  .resultado-item.no-carrinho{background:var(--green-bg);border-color:var(--green-border);opacity:.8;}
+  .resultado-item.no-carrinho .ri-nome{color:var(--text2);}
+  .resultado-item.naotm-item{background:var(--red-bg);border-color:var(--red-border);opacity:.7;}
+  .resultado-item.naotm-item .ri-nome{color:var(--red);text-decoration:line-through;}
+  .ri-qty{font-family:'DM Mono',monospace;font-size:14px;font-weight:600;color:var(--text2);background:var(--surface2);padding:3px 8px;border-radius:4px;flex-shrink:0;}
+  .ri-nome{flex:1;line-height:1.4;display:flex;flex-direction:column;gap:3px;}
+  .ri-nome .ri-pratos{font-size:9px;font-family:'DM Mono',monospace;}
+  .ri-nome .ri-pratos .pp-badge{background:#FAC775;color:#4A1B0C;border-radius:4px;padding:1px 5px;margin-right:2px;}
+  .ri-naotm{width:38px;height:38px;border-radius:8px;border:1.5px solid var(--red-border);background:var(--red-bg);flex-shrink:0;display:flex;align-items:center;justify-content:center;color:var(--red);font-size:17px;cursor:pointer;}
+  .ri-naotm:active{opacity:.5;}
+  .ri-volta{width:38px;height:38px;border-radius:8px;border:1.5px solid var(--border2);background:var(--surface2);flex-shrink:0;display:flex;align-items:center;justify-content:center;color:var(--text2);font-size:18px;cursor:pointer;}
+  .ri-volta:active{opacity:.6;}
+
+  /* Cortes alternativos (na lista e no mercado) */
+  .cortes-wrap{padding:8px 0 4px 22px;display:flex;flex-direction:column;gap:4px;width:100%;}
+  .corte-opt{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text2);cursor:pointer;}
+  .corte-opt .corte-radio{width:14px;height:14px;border:1.5px solid var(--border2);border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+  .corte-opt.active .corte-radio{border-color:var(--text);}
+  .corte-opt.active .corte-radio::after{content:'';width:7px;height:7px;border-radius:50%;background:var(--text);}
+  .corte-opt.active{color:var(--text);font-weight:500;}
+  .corte-helper{font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-left:22px;margin-top:2px;}
+
+  .item-com-cortes{flex-direction:column;align-items:stretch;}
+
+  .bloco-label{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-family:'DM Mono',monospace;padding-bottom:6px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;user-select:none;}
+  .carrinho-block{margin-top:28px;}
+  .carrinho-label{border-bottom:2px solid var(--green);color:var(--green);}
+  .naotm-block{margin-top:28px;}
+  .naotm-label{border-bottom:2px solid var(--red-border);color:var(--red);}
+  .catalogo-block{margin-top:28px;}
+  .catalogo-label{border-bottom:2px dashed var(--border2);color:var(--text2);}
+  .resultado-item.catalogo-item{background:var(--surface2);border-color:var(--border);opacity:.9;}
+  .resultado-item.catalogo-item .ri-nome{color:var(--text2);}
+  .ri-setor-badge{font-size:10px;font-family:'DM Mono',monospace;background:var(--border);color:var(--text3);border-radius:4px;padding:2px 6px;flex-shrink:0;white-space:nowrap;max-width:80px;overflow:hidden;text-overflow:ellipsis;}
+  .ri-add{width:38px;height:38px;border-radius:8px;border:1.5px solid var(--border2);background:var(--surface);flex-shrink:0;display:flex;align-items:center;justify-content:center;color:var(--text2);font-size:22px;font-weight:300;cursor:pointer;}
+  .empty{text-align:center;padding:48px 20px;color:var(--text3);font-size:16px;}
+
+  /* Loading */
+  .loading{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 20px;color:var(--text3);font-size:14px;gap:12px;}
+  .spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--text);border-radius:50%;animation:spin 1s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  .erro{padding:24px 20px;background:var(--red-bg);border:1px solid var(--red-border);color:var(--red);border-radius:var(--radius);margin:16px 20px;font-size:14px;line-height:1.5;}
+  .erro button{margin-top:8px;font-size:12px;padding:6px 12px;background:var(--red);color:#FFF;border:none;border-radius:4px;cursor:pointer;}
+</style>
+</head>
+<body>
+
+<!-- ============ TELA CARDÁPIO ============ -->
+<div id="tela-cardapio">
+  <div class="header">
+    <div class="header-top">
+      <div>
+        <div class="header-title">Cardápio da semana</div>
+        <div class="header-sub" id="cardapio-sub">escolha os pratos</div>
+      </div>
+      <button class="btn-pular" onclick="pularCardapio()">pular →</button>
+    </div>
+    <div class="toggle-vista">
+      <div class="toggle-vista-inner">
+        <div class="toggle-opt active" data-vista="semana" onclick="setVistaCardapio('semana')">Por semana</div>
+        <div class="toggle-opt" data-vista="categoria" onclick="setVistaCardapio('categoria')">Por categoria</div>
+      </div>
+    </div>
+  </div>
+  <div class="content" id="cardapio-content">
+    <div class="loading"><div class="spinner"></div><div>carregando dados…</div></div>
+  </div>
+  <div class="footer">
+    <div class="footer-info" id="cardapio-info">0 escolhidos</div>
+    <div class="footer-btns">
+      <button class="btn btn-ghost" onclick="limparCardapio()">Limpar</button>
+      <button class="btn btn-primary" id="btn-cardapio-prox" onclick="irParaSugestoes()" disabled>Próximo →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ TELA SUGESTÕES ============ -->
+<div id="tela-sugestoes" style="display:none;">
+  <div class="header">
+    <div class="header-top">
+      <div>
+        <div class="header-title">Confere se tem em casa</div>
+        <div class="header-sub" id="sugestoes-sub">itens mensais dos pratos</div>
+      </div>
+    </div>
+  </div>
+  <div class="sug-intro">
+    Itens semanais dos pratos (carnes, verduras) já entraram na lista. Aqui são só os <b>mensais</b> que vale conferir — marca "tenho" se já tá em casa, ou "+ comprar" pra ir pra lista.
+  </div>
+  <div class="content" id="sugestoes-content"></div>
+  <div class="footer">
+    <div class="footer-info" id="sugestoes-info"></div>
+    <div class="footer-btns">
+      <button class="btn btn-ghost" onclick="voltarParaCardapio()">← Cardápio</button>
+      <button class="btn btn-primary" onclick="irParaLista()">Ir pra lista →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ TELA LISTA ============ -->
+<div id="tela-lista" style="display:none;">
+  <div class="header">
+    <div class="header-top">
+      <div>
+        <div class="header-title">Minha Lista</div>
+        <div class="header-sub" id="lista-sub">toque para retirar da lista</div>
+      </div>
+    </div>
+    <div id="banner-cardapio-container"></div>
+    <div class="search-wrap">
+      <input type="search" class="search-input" id="busca" placeholder="Buscar ou adicionar novo item..." oninput="onBusca()" autocomplete="off">
+      <button class="btn-add-new" id="btn-add-new" onclick="adicionarNovo()">+ Adicionar</button>
+    </div>
+  </div>
+  <div class="content" id="lista-content"></div>
+  <div class="footer">
+    <div class="footer-info" id="lista-info"></div>
+    <div class="footer-btns">
+      <button class="btn btn-ghost" onclick="voltarParaCardapio()">← Cardápio</button>
+      <button class="btn btn-ghost" onclick="resetarTudo()">Resetar</button>
+      <button class="btn btn-primary" onclick="irParaMercado()">Mercado →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ MODAL ============ -->
+<div class="modal-overlay" id="modal" onclick="fecharModalFora(event)">
+  <div class="modal">
+    <h3>Colar lista do WhatsApp</h3>
+    <p>Cole abaixo o texto copiado anteriormente.</p>
+    <textarea id="modal-texto" placeholder="Cole aqui a lista..."></textarea>
+    <div class="modal-btns">
+      <button class="btn btn-ghost" onclick="fecharModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="importarColado()">Carregar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ TELA MERCADO ============ -->
+<div id="tela-mercado">
+  <div class="header">
+    <div class="header-top">
+      <div>
+        <div class="header-title">No Mercado</div>
+        <div class="header-sub" id="mercado-sub"></div>
+      </div>
+      <button class="btn-pular" onclick="toggleRetrairSetores()" id="btn-retrair">⊟ retrair</button>
+    </div>
+    <div class="search-wrap">
+      <input type="search" class="search-input" id="busca-mercado" placeholder="Buscar ou adicionar item..." oninput="onBuscaMercado()" autocomplete="off">
+      <button class="btn-add-new" id="btn-add-mercado" onclick="adicionarNoMercado()">+ Adicionar</button>
+    </div>
+  </div>
+  <div class="content" id="mercado-content"></div>
+  <div class="footer">
+    <div class="footer-info" id="mercado-info"></div>
+    <div class="footer-btns">
+      <button class="btn btn-ghost" onclick="voltarParaLista()">← Lista</button>
+      <button class="btn btn-primary" id="btn-zap" onclick="copiarZap()">Copiar p/ WhatsApp</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// CONFIG — URLs dos CSVs publicados no Google Sheets
+// ============================================================
+var CSV_URLS = {
+  itens: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQaewGdjNzsgVI4Jhni5-uHNuHdsZ_uNoIJxlWOWi88Fm3_PJQ0I57J1awb8-eGWQ/pub?gid=1366167683&single=true&output=csv",
+  pratos: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQaewGdjNzsgVI4Jhni5-uHNuHdsZ_uNoIJxlWOWi88Fm3_PJQ0I57J1awb8-eGWQ/pub?gid=264078528&single=true&output=csv",
+  receitas: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQaewGdjNzsgVI4Jhni5-uHNuHdsZ_uNoIJxlWOWi88Fm3_PJQ0I57J1awb8-eGWQ/pub?gid=1607210539&single=true&output=csv",
+  cardapio: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQaewGdjNzsgVI4Jhni5-uHNuHdsZ_uNoIJxlWOWi88Fm3_PJQ0I57J1awb8-eGWQ/pub?gid=1866996234&single=true&output=csv"
+};
+
+// Setores universais (sempre disponíveis em casa, não viram sugestão)
+var TEMPEROS_UNIVERSAIS = new Set([
+  "Sal refinado", "Sal grosso", "Óleo", "Azeite",
+  "Alho descascado (1kg)", "Vinagre de álcool", "Vinagre de maçã"
+]);
+
+var ORDEM_SETORES = [
+  "Hortifruti", "Açougue", "Setor de Frios", "Padaria", "Laticínios",
+  "Congelados", "Café & Snacks", "Despensa & Grãos", "Temperos & Condimentos",
+  "Limpeza", "Utilidades & Embalagens", "Cuidados Pessoais", "Pet", "Outros"
+];
+
+var CACHE_KEY = "mercado_dados_v1";
+var STATE_KEY = "mercado_estado_v1";
+
+// ============================================================
+// ESTADO
+// ============================================================
+var DADOS = { itens: [], pratos: [], receitas: [], cardapio: [] };
+var STATE = {
+  cardapioSel: {},      // { "Prato": true }
+  sugRespostas: {},     // { "Item": "tenho" | "comprar" }
+  lista: {},            // { "Item": { qty, checked, fromPratos: [...], corteEscolhido } }
+  mercado: {},          // { "Item": { feito, naoTem } }
+  vistaCardapio: "semana",
+  itensCustom: [],
+  colapsado: {},
+  colapsadoSel: {},
+  telaAtiva: "cardapio"
+};
+
+function salvarEstado(){
+  try { localStorage.setItem(STATE_KEY, JSON.stringify(STATE)); } catch(e){}
+}
+function carregarEstado(){
+  try {
+    var s = localStorage.getItem(STATE_KEY);
+    if(s){
+      var loaded = JSON.parse(s);
+      Object.keys(loaded).forEach(function(k){ STATE[k] = loaded[k]; });
+    }
+  } catch(e){}
+}
+
+// ============================================================
+// FETCH + CACHE
+// ============================================================
+function parseCSV(text){
+  var rows = [];
+  var i = 0, field = "", row = [], inQuotes = false;
+  while(i < text.length){
+    var c = text[i];
+    if(inQuotes){
+      if(c === '"'){
+        if(text[i+1] === '"'){ field += '"'; i += 2; continue; }
+        inQuotes = false; i++; continue;
+      }
+      field += c; i++;
+    } else {
+      if(c === '"'){ inQuotes = true; i++; continue; }
+      if(c === ','){ row.push(field); field = ""; i++; continue; }
+      if(c === '\r'){ i++; continue; }
+      if(c === '\n'){ row.push(field); rows.push(row); row = []; field = ""; i++; continue; }
+      field += c; i++;
+    }
+  }
+  if(field.length > 0 || row.length > 0){ row.push(field); rows.push(row); }
+  if(rows.length === 0) return [];
+  var headers = rows[0].map(function(h){ return h.trim(); });
+  var data = [];
+  for(var r = 1; r < rows.length; r++){
+    if(rows[r].length === 1 && rows[r][0] === "") continue;
+    var obj = {};
+    headers.forEach(function(h, idx){ obj[h] = (rows[r][idx] || "").trim(); });
+    data.push(obj);
+  }
+  return data;
+}
+
+function fetchCSV(url, label){
+  return fetch(url, { cache: "no-store" }).then(function(r){
+    if(!r.ok) throw new Error("[" + label + "] HTTP " + r.status);
+    return r.text();
+  }).then(function(text){
+    if(text.indexOf("<!DOCTYPE") === 0 || text.indexOf("<html") >= 0){
+      throw new Error("[" + label + "] resposta veio como HTML (talvez sem permissão pública)");
+    }
+    return parseCSV(text);
+  }).catch(function(e){
+    e.message = "[" + label + "] " + e.message;
+    throw e;
+  });
+}
+
+function carregarDados(forceRefresh){
+  // Tenta cache primeiro
+  if(!forceRefresh){
+    try {
+      var cached = localStorage.getItem(CACHE_KEY);
+      if(cached){
+        var c = JSON.parse(cached);
+        if(c.timestamp && (Date.now() - c.timestamp) < 7 * 24 * 60 * 60 * 1000){
+          DADOS = c.data;
+          return Promise.resolve();
+        }
+      }
+    } catch(e){}
+  }
+  return Promise.all([
+    fetchCSV(CSV_URLS.itens, "Itens"),
+    fetchCSV(CSV_URLS.pratos, "Pratos"),
+    fetchCSV(CSV_URLS.receitas, "Receitas"),
+    fetchCSV(CSV_URLS.cardapio, "Cardápio")
+  ]).then(function(results){
+    DADOS = {
+      itens: results[0],
+      pratos: results[1],
+      receitas: results[2],
+      cardapio: results[3]
+    };
+    try { localStorage.setItem(CACHE_KEY, JSON.stringify({ timestamp: Date.now(), data: DADOS })); } catch(e){}
+  });
+}
+
+// ============================================================
+// HELPERS
+// ============================================================
+function esc(s){ return String(s||"").replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+function chave(n){ return String(n||"").replace(/[^a-zA-Z0-9]/g,'_'); }
+function pad2(n){ return n<10?'0'+n:''+n; }
+
+function todosItens(){
+  return DADOS.itens.concat(STATE.itensCustom);
+}
+
+function getItemByNome(nome){
+  return todosItens().find(function(it){
+    var n = it["Nome do Item"] || it.nome;
+    return n && n.toLowerCase() === nome.toLowerCase();
+  });
+}
+
+function getReceitaDoPrato(prato){
+  return DADOS.receitas.filter(function(r){ return r.Prato === prato; });
+}
+
+function getCortesDoItem(item){
+  var c = item.Cortes || item.cortes || "";
+  if(!c) return [];
+  return c.split(",").map(function(x){ return x.trim(); }).filter(Boolean);
+}
+
+function itemNome(it){
+  return it["Nome do Item"] || it.nome;
+}
+
+function itemSetor(it){
+  return it["Setor no Mercado"] || it.setor || "Outros";
+}
+
+function itemLocal(it){
+  return it["Local em Casa"] || it.cat || "";
+}
+
+// ============================================================
+// TROCAR DE TELA
+// ============================================================
+function showTela(nome){
+  ["cardapio","sugestoes","lista","mercado"].forEach(function(t){
+    var el = document.getElementById("tela-" + t);
+    if(el) el.style.display = (t === nome) ? "block" : "none";
+  });
+  STATE.telaAtiva = nome;
+  salvarEstado();
+  window.scrollTo(0, 0);
+}
+
+// ============================================================
+// TELA CARDÁPIO
+// ============================================================
+function setVistaCardapio(v){
+  STATE.vistaCardapio = v;
+  document.querySelectorAll(".toggle-opt").forEach(function(el){
+    el.classList.toggle("active", el.dataset.vista === v);
+  });
+  renderCardapio();
+}
+
+function selecionarPrato(prato){
+  STATE.cardapioSel[prato] = !STATE.cardapioSel[prato];
+  if(!STATE.cardapioSel[prato]) delete STATE.cardapioSel[prato];
+  salvarEstado();
+  renderCardapio();
+  atualizarFooterCardapio();
+}
+
+function marcarSemanaTodos(mes, sem){
+  var pratos = DADOS.cardapio.filter(function(c){
+    return c["Mês"] === mes && c.Semana === sem;
+  });
+  var todosMarcados = pratos.every(function(p){ return STATE.cardapioSel[p.Prato]; });
+  pratos.forEach(function(p){
+    if(todosMarcados){ delete STATE.cardapioSel[p.Prato]; }
+    else { STATE.cardapioSel[p.Prato] = true; }
+  });
+  salvarEstado();
+  renderCardapio();
+  atualizarFooterCardapio();
+}
+
+function limparCardapio(){
+  STATE.cardapioSel = {};
+  STATE.sugRespostas = {};
+  salvarEstado();
+  renderCardapio();
+  atualizarFooterCardapio();
+}
+
+function atualizarFooterCardapio(){
+  var n = Object.keys(STATE.cardapioSel).length;
+  document.getElementById("cardapio-info").textContent = n + " escolhido" + (n===1?"":"s");
+  document.getElementById("btn-cardapio-prox").disabled = (n === 0);
+}
+
+function getCategoriaDePrato(prato){
+  var p = DADOS.pratos.find(function(x){ return x.Prato === prato; });
+  return p ? p.Categoria : "";
+}
+
+function getDificuldadeDePrato(prato){
+  var p = DADOS.pratos.find(function(x){ return x.Prato === prato; });
+  if(!p || !p["Dificuldade (1-4)"]) return "";
+  var n = parseInt(p["Dificuldade (1-4)"], 10);
+  return n ? "★".repeat(n) : "";
+}
+
+function isSalada(prato){
+  return getCategoriaDePrato(prato) === "Salada";
+}
+
+function renderCardapio(){
+  if(!DADOS.itens.length){
+    document.getElementById("cardapio-content").innerHTML =
+      '<div class="loading"><div class="spinner"></div><div>carregando dados…</div></div>';
+    return;
+  }
+  var html = "";
+  if(STATE.vistaCardapio === "semana"){
+    // Agrupado por mês × semana
+    var semanas = {};
+    DADOS.cardapio.forEach(function(c){
+      var key = c["Mês"] + "·" + c.Semana;
+      if(!semanas[key]) semanas[key] = { mes: c["Mês"], sem: c.Semana, pratos: [] };
+      semanas[key].pratos.push(c.Prato);
+    });
+    Object.keys(semanas).forEach(function(k){
+      var s = semanas[k];
+      var proteinas = s.pratos.filter(function(p){ return !isSalada(p); });
+      var saladas = s.pratos.filter(function(p){ return isSalada(p); });
+      html += '<div class="sem-bloco">'
+        +'<div class="sem-head">'
+        +'<div class="sem-label">'+esc(s.mes)+' · '+esc(s.sem)+'</div>'
+        +'<button class="sem-btn" onclick="marcarSemanaTodos(\''+esc(s.mes)+'\',\''+esc(s.sem)+'\')">+ marcar tudo</button>'
+        +'</div>';
+      proteinas.forEach(function(p){
+        var sel = !!STATE.cardapioSel[p];
+        html += '<div class="prato-row'+(sel?' selecionado':'')+'" onclick="selecionarPrato(\''+esc(p).replace(/'/g,"\\'")+'\')">'
+          +'<div class="pr-check">'+(sel?'<svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 5l2 2 4-4"/></svg>':'')+'</div>'
+          +'<div class="pr-nome">'+esc(p)+'</div>'
+          +'<div class="pr-dif">'+getDificuldadeDePrato(p)+'</div>'
+          +'</div>';
+      });
+      if(saladas.length){
+        html += '<div class="salada-label">saladas da semana</div>';
+        saladas.forEach(function(p){
+          var sel = !!STATE.cardapioSel[p];
+          html += '<div class="prato-row salada'+(sel?' selecionado':'')+'" onclick="selecionarPrato(\''+esc(p).replace(/'/g,"\\'")+'\')">'
+            +'<div class="pr-check">'+(sel?'<svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 5l2 2 4-4"/></svg>':'')+'</div>'
+            +'<div class="pr-nome">'+esc(p)+'</div>'
+            +'</div>';
+        });
+      }
+      html += '</div>';
+    });
+  } else {
+    // Por categoria
+    var cats = ["Proteína","Fim de semana","Acompanhamento","Refogado jantar","Salada"];
+    cats.forEach(function(cat){
+      var pratos = DADOS.pratos.filter(function(p){ return p.Categoria === cat; });
+      if(!pratos.length) return;
+      html += '<div class="cat-bloco">'
+        +'<div class="cat-head"><span>'+esc(cat)+'</span><span>'+pratos.length+'</span></div>';
+      pratos.forEach(function(p){
+        var sel = !!STATE.cardapioSel[p.Prato];
+        html += '<div class="prato-row'+(sel?' selecionado':'')+(cat==='Salada'?' salada':'')+'" onclick="selecionarPrato(\''+esc(p.Prato).replace(/'/g,"\\'")+'\')">'
+          +'<div class="pr-check">'+(sel?'<svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 5l2 2 4-4"/></svg>':'')+'</div>'
+          +'<div class="pr-nome">'+esc(p.Prato)+'</div>'
+          +'<div class="pr-dif">'+getDificuldadeDePrato(p.Prato)+'</div>'
+          +'</div>';
+      });
+      html += '</div>';
+    });
+  }
+  document.getElementById("cardapio-content").innerHTML = html;
+  atualizarFooterCardapio();
+}
+
+function pularCardapio(){
+  STATE.cardapioSel = {};
+  STATE.sugRespostas = {};
+  // Vai direto pra lista (vazia, sem pratos)
+  popularListaInicial();
+  showTela("lista");
+  renderLista();
+}
+
+function irParaSugestoes(){
+  popularListaInicial();
+  renderSugestoes();
+  showTela("sugestoes");
+}
+
+// ============================================================
+// TELA SUGESTÕES
+// ============================================================
+function calcularSugestoesMensais(){
+  // Pega TODOS os ingredientes de TODOS os pratos selecionados
+  // Filtra só os "mensais" (= não-semanal e não-tempero universal)
+  // Agrupa por ingrediente com lista de pratos
+  var sugs = {};
+  var pratosSel = Object.keys(STATE.cardapioSel);
+  pratosSel.forEach(function(prato){
+    var recs = getReceitaDoPrato(prato);
+    recs.forEach(function(r){
+      var ing = r.Ingrediente;
+      if(!ing) return;
+      if(TEMPEROS_UNIVERSAIS.has(ing)) return;
+      var item = getItemByNome(ing);
+      if(!item) return;
+      // Considera "mensal a conferir" se o ingrediente NÃO é fresco (não perecível típico)
+      // Heurística: setores Hortifruti/Açougue/Setor de Frios/Padaria/Congelados/Laticínios = semanal (entra direto)
+      // Setores Despensa/Temperos/Utilidades/Limpeza/Café = mensal (pergunta)
+      var setor = itemSetor(item);
+      var setoresSemanais = ["Hortifruti","Açougue","Setor de Frios","Padaria","Congelados","Laticínios"];
+      var ehSemanal = setoresSemanais.indexOf(setor) >= 0;
+      if(ehSemanal) return; // já entrou na lista direto
+      if(!sugs[ing]) sugs[ing] = { item: item, pratos: [] };
+      if(sugs[ing].pratos.indexOf(prato) < 0) sugs[ing].pratos.push(prato);
+    });
+  });
+  return Object.keys(sugs).map(function(k){ return sugs[k]; });
+}
+
+function responderSugestao(ing, resposta){
+  STATE.sugRespostas[ing] = resposta;
+  if(resposta === "comprar"){
+    addItemDaSugestao(ing);
+  } else if(resposta === "tenho"){
+    removeItemDaSugestao(ing);
+  }
+  salvarEstado();
+  renderSugestoes();
+}
+
+function addItemDaSugestao(ing){
+  var item = getItemByNome(ing);
+  if(!item) return;
+  var sugs = calcularSugestoesMensais();
+  var match = sugs.find(function(s){ return itemNome(s.item) === ing; });
+  var fromPratos = match ? match.pratos : [];
+  if(!STATE.lista[ing]) STATE.lista[ing] = { qty: 1, checked: true, fromPratos: fromPratos };
+  else { STATE.lista[ing].checked = true; STATE.lista[ing].fromPratos = fromPratos; }
+}
+
+function removeItemDaSugestao(ing){
+  // Só remove se foi adicionado pela sugestão (não tinha sido marcado pelo usuário antes)
+  // Pra simplificar: marca como não-checked
+  if(STATE.lista[ing]) STATE.lista[ing].checked = false;
+}
+
+function renderSugestoes(){
+  var sugs = calcularSugestoesMensais();
+  if(!sugs.length){
+    document.getElementById("sugestoes-content").innerHTML =
+      '<div class="empty">Nada pra conferir 🎉<br><span style="font-size:13px;">Todos os ingredientes dos seus pratos são semanais ou universais.</span></div>';
+    document.getElementById("sugestoes-info").textContent = "";
+    return;
+  }
+  var html = "";
+  sugs.forEach(function(s){
+    var ing = itemNome(s.item);
+    var resp = STATE.sugRespostas[ing];
+    html += '<div class="sug-item">'
+      +'<div class="sug-info">'
+      +'<div class="sug-nome">'+esc(ing)+'</div>'
+      +'<div class="sug-pratos">'+s.pratos.map(function(p){ return '<span class="sug-badge">'+esc(p)+'</span>'; }).join('')+'</div>'
+      +'</div>'
+      +'<div class="sug-btns">'
+      +'<button class="sug-btn sug-tenho'+(resp==='tenho'?' active':'')+'" onclick="responderSugestao(\''+esc(ing).replace(/'/g,"\\'")+'\',\'tenho\')">tenho</button>'
+      +'<button class="sug-btn sug-comprar'+(resp==='comprar'?' active':'')+'" onclick="responderSugestao(\''+esc(ing).replace(/'/g,"\\'")+'\',\'comprar\')">+ comprar</button>'
+      +'</div>'
+      +'</div>';
+  });
+  document.getElementById("sugestoes-content").innerHTML = html;
+  var respondidas = sugs.filter(function(s){ return STATE.sugRespostas[itemNome(s.item)]; }).length;
+  document.getElementById("sugestoes-info").textContent = respondidas + " de " + sugs.length + " respondidas";
+}
+
+// ============================================================
+// POPULAR LISTA INICIAL (com itens semanais dos pratos)
+// ============================================================
+function popularListaInicial(){
+  STATE.lista = {};
+  var pratosSel = Object.keys(STATE.cardapioSel);
+  var setoresSemanais = ["Hortifruti","Açougue","Setor de Frios","Padaria","Congelados","Laticínios"];
+  pratosSel.forEach(function(prato){
+    var recs = getReceitaDoPrato(prato);
+    recs.forEach(function(r){
+      var ing = r.Ingrediente;
+      if(!ing) return;
+      if(TEMPEROS_UNIVERSAIS.has(ing)) return;
+      var item = getItemByNome(ing);
+      if(!item) return;
+      var setor = itemSetor(item);
+      if(setoresSemanais.indexOf(setor) < 0) return; // não é semanal, vai pra sugestão
+      if(!STATE.lista[ing]){
+        STATE.lista[ing] = { qty: 1, checked: true, fromPratos: [prato] };
+      } else {
+        if(STATE.lista[ing].fromPratos.indexOf(prato) < 0){
+          STATE.lista[ing].fromPratos.push(prato);
+        }
+        STATE.lista[ing].checked = true;
+      }
+    });
+  });
+  salvarEstado();
+}
+
+// ============================================================
+// TELA LISTA
+// ============================================================
+function voltarParaCardapio(){
+  showTela("cardapio");
+  renderCardapio();
+}
+
+function irParaLista(){
+  renderLista();
+  showTela("lista");
+}
+
+function onBusca(){
+  renderLista();
+  var v = document.getElementById("busca").value.trim();
+  var btn = document.getElementById("btn-add-new");
+  if(v.length > 1){
+    var ex = todosItens().some(function(it){ return itemNome(it).toLowerCase() === v.toLowerCase(); });
+    btn.classList.toggle("visible", !ex);
+  } else {
+    btn.classList.remove("visible");
+  }
+}
+
+function adicionarNovo(){
+  var v = document.getElementById("busca").value.trim();
+  if(!v) return;
+  if(todosItens().some(function(it){ return itemNome(it).toLowerCase() === v.toLowerCase(); })){ alert("Item já existe."); return; }
+  var novo = { "Nome do Item": v, "Local em Casa": "Outros", "Setor no Mercado": "Outros", "Cortes": "", custom: true };
+  STATE.itensCustom.push(novo);
+  STATE.lista[v] = { qty: 1, checked: true, fromPratos: [] };
+  salvarEstado();
+  document.getElementById("busca").value = "";
+  document.getElementById("btn-add-new").classList.remove("visible");
+  renderLista();
+}
+
+function toggleSelecaoLista(nome){
+  if(!STATE.lista[nome]) STATE.lista[nome] = { qty: 1, checked: false, fromPratos: [] };
+  STATE.lista[nome].checked = !STATE.lista[nome].checked;
+  if(!STATE.lista[nome].checked) STATE.lista[nome].qty = 1;
+  salvarEstado();
+  renderLista();
+}
+
+function changeQty(nome, d){
+  if(!STATE.lista[nome]) STATE.lista[nome] = { qty: 1, checked: true, fromPratos: [] };
+  STATE.lista[nome].qty = Math.max(1, STATE.lista[nome].qty + d);
+  salvarEstado();
+  var el = document.getElementById("qn-" + chave(nome));
+  if(el) el.textContent = STATE.lista[nome].qty;
+}
+
+function renderBannerCardapio(){
+  var n = Object.keys(STATE.cardapioSel).length;
+  var container = document.getElementById("banner-cardapio-container");
+  if(n === 0){ container.innerHTML = ""; return; }
+  var fromPratos = 0;
+  Object.keys(STATE.lista).forEach(function(k){
+    if(STATE.lista[k].fromPratos && STATE.lista[k].fromPratos.length && STATE.lista[k].checked) fromPratos++;
+  });
+  container.innerHTML = '<div class="banner-cardapio">'
+    +'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 13.87A4 4 0 0 1 7.41 6a5.11 5.11 0 0 1 1.05-1.54 5 5 0 0 1 7.08 0A5.11 5.11 0 0 1 16.59 6 4 4 0 0 1 18 13.87V21H6Z"/><line x1="6" y1="17" x2="18" y2="17"/></svg>'
+    +'<span class="b-info">'+n+' prato'+(n===1?'':'s')+' no cardápio · '+fromPratos+' item'+(fromPratos===1?'':'s')+' veio do cardápio</span>'
+    +'<button onclick="voltarParaCardapio()">editar</button>'
+    +'</div>';
+}
+
+function renderLista(){
+  renderBannerCardapio();
+  var busca = document.getElementById("busca").value.toLowerCase().trim();
+  var todos = todosItens().filter(function(it){
+    return !busca || itemNome(it).toLowerCase().indexOf(busca) >= 0;
+  });
+  // Considera "na lista" todos os itens com lista[nome].checked === true
+  var noLista = [];
+  var fora = [];
+  todos.forEach(function(it){
+    var nm = itemNome(it);
+    var e = STATE.lista[nm];
+    if(e && e.checked) noLista.push(it);
+    else fora.push(it);
+  });
+  var mapaLocal = {};
+  var ordemLocais = [];
+  noLista.forEach(function(it){
+    var loc = itemLocal(it) || "Outros";
+    if(!mapaLocal[loc]){ mapaLocal[loc] = []; ordemLocais.push(loc); }
+    mapaLocal[loc].push(it);
+  });
+  var html = "";
+  if(!todos.length){
+    html = '<div class="empty">Nenhum item encontrado</div>';
+  } else {
+    ordemLocais.forEach(function(loc){
+      var coll = !!STATE.colapsadoSel[loc];
+      html += '<div class="cat-block">'
+        +'<div class="cat-label" data-cat-sel="'+esc(loc)+'">'
+        +'<span>'+esc(loc)+'</span>'
+        +'<span style="display:flex;align-items:center;gap:4px;">'
+        +'<span style="font-weight:400;">'+mapaLocal[loc].length+'</span>'
+        +'<span class="cat-chevron'+(coll?' collapsed':'')+'">▼</span>'
+        +'</span></div>';
+      if(!coll){
+        mapaLocal[loc].forEach(function(it){
+          var nm = itemNome(it);
+          var e = STATE.lista[nm] || { qty: 1, checked: true, fromPratos: [] };
+          var k = chave(nm);
+          var hasPratos = e.fromPratos && e.fromPratos.length > 0;
+          html += '<div class="item'+(hasPratos?' from-prato':'')+'" data-nome="'+esc(nm)+'">'
+            +'<div class="item-name">'
+            +'<span>'+esc(nm)+'</span>';
+          if(hasPratos){
+            html += '<span class="item-pratos">'+e.fromPratos.map(function(p){ return '<span class="pp-badge">'+esc(p)+'</span>'; }).join('')+'</span>';
+          }
+          html += '</div>'
+            +(it.custom?'<span class="badge-novo">novo</span>':'')
+            +'<div class="qty-wrap">'
+            +'<button class="qty-btn" data-qty="'+esc(nm)+'" data-d="-1">−</button>'
+            +'<span class="qty-num" id="qn-'+k+'">'+e.qty+'</span>'
+            +'<button class="qty-btn" data-qty="'+esc(nm)+'" data-d="1">+</button>'
+            +'</div></div>';
+        });
+      }
+      html += '</div>';
+    });
+    if(fora.length > 0){
+      var collFora = !!STATE.colapsadoSel["__fora__"];
+      html += '<div class="fora-block">'
+        +'<div class="fora-label" data-cat-sel="__fora__">'
+        +'<span>Fora da lista</span>'
+        +'<span style="display:flex;align-items:center;gap:4px;">'
+        +'<span style="font-weight:400;">'+fora.length+'</span>'
+        +'<span class="cat-chevron'+(collFora?' collapsed':'')+'">▼</span>'
+        +'</span></div>';
+      if(!collFora){
+        fora.forEach(function(it){
+          var nm = itemNome(it);
+          html += '<div class="item desmarcado" data-nome="'+esc(nm)+'">'
+            +'<div class="item-name"><span>'+esc(nm)+'</span></div>'
+            +(it.custom?'<span class="badge-novo">novo</span>':'')
+            +'<div class="qty-wrap"></div></div>';
+        });
+      }
+      html += '</div>';
+    }
+  }
+  document.getElementById("lista-content").innerHTML = html;
+  atualizarFooterLista();
+  bindListaEvents();
+}
+
+function bindListaEvents(){
+  document.querySelectorAll("#lista-content [data-cat-sel]").forEach(function(el){
+    el.addEventListener("click", function(){
+      STATE.colapsadoSel[el.dataset.catSel] = !STATE.colapsadoSel[el.dataset.catSel];
+      salvarEstado();
+      renderLista();
+    });
+  });
+  document.querySelectorAll("#lista-content .item").forEach(function(el){
+    var sY, sX, mv;
+    el.addEventListener("touchstart", function(e){ sY = e.touches[0].clientY; sX = e.touches[0].clientX; mv = false; el.classList.add("pressed"); }, { passive: true });
+    el.addEventListener("touchmove", function(e){
+      if(Math.abs(e.touches[0].clientY - sY) > 8 || Math.abs(e.touches[0].clientX - sX) > 8){ mv = true; el.classList.remove("pressed"); }
+    }, { passive: true });
+    el.addEventListener("touchend", function(e){
+      el.classList.remove("pressed");
+      if(mv) return;
+      var btn = e.target.closest("[data-qty]");
+      if(btn){ e.preventDefault(); changeQty(btn.dataset.qty, parseInt(btn.dataset.d)); return; }
+      if(e.target.closest(".qty-wrap")) return;
+      e.preventDefault();
+      var sc = window.scrollY;
+      toggleSelecaoLista(el.dataset.nome);
+      requestAnimationFrame(function(){ window.scrollTo(0, sc); });
+    });
+    el.addEventListener("click", function(e){
+      var btn = e.target.closest("[data-qty]");
+      if(btn){ changeQty(btn.dataset.qty, parseInt(btn.dataset.d)); return; }
+      if(e.target.closest(".qty-wrap")) return;
+      var sc = window.scrollY;
+      toggleSelecaoLista(el.dataset.nome);
+      requestAnimationFrame(function(){ window.scrollTo(0, sc); });
+    });
+  });
+}
+
+function atualizarFooterLista(){
+  var n = 0, total = todosItens().length;
+  Object.keys(STATE.lista).forEach(function(k){ if(STATE.lista[k].checked) n++; });
+  document.getElementById("lista-info").textContent = n + " na lista";
+}
+
+function resetarTudo(){
+  if(!confirm("Resetar tudo (cardápio, lista, sugestões)?")) return;
+  STATE.cardapioSel = {};
+  STATE.sugRespostas = {};
+  STATE.lista = {};
+  STATE.mercado = {};
+  STATE.itensCustom = [];
+  STATE.colapsado = {};
+  STATE.colapsadoSel = {};
+  salvarEstado();
+  document.getElementById("busca").value = "";
+  document.getElementById("btn-add-new").classList.remove("visible");
+  showTela("cardapio");
+  renderCardapio();
+}
+
+// ============================================================
+// TELA MERCADO
+// ============================================================
+function irParaMercado(){
+  var sel = todosItens().filter(function(it){
+    var nm = itemNome(it);
+    return STATE.lista[nm] && STATE.lista[nm].checked;
+  });
+  if(!sel.length){ alert("Nenhum item na lista."); return; }
+  // Reset estado mercado
+  sel.forEach(function(it){
+    var nm = itemNome(it);
+    if(!STATE.mercado[nm]) STATE.mercado[nm] = { feito: false, naoTem: false };
+    STATE.mercado[nm].feito = false;
+    STATE.mercado[nm].naoTem = false;
+  });
+  STATE.colapsado = {};
+  var data = new Date().toLocaleDateString("pt-BR");
+  document.getElementById("mercado-sub").textContent = sel.length + " itens · " + data;
+  document.getElementById("busca-mercado").value = "";
+  document.getElementById("btn-add-mercado").classList.remove("visible");
+  salvarEstado();
+  renderMercado();
+  showTela("mercado");
+}
+
+function voltarParaLista(){
+  showTela("lista");
+  renderLista();
+}
+
+function toggleRetrairSetores(){
+  var sel = todosItens().filter(function(it){
+    var nm = itemNome(it);
+    return STATE.lista[nm] && STATE.lista[nm].checked &&
+           STATE.mercado[nm] && !STATE.mercado[nm].feito && !STATE.mercado[nm].naoTem;
+  });
+  var setoresAtivos = [];
+  sel.forEach(function(it){
+    var s = itemSetor(it);
+    if(setoresAtivos.indexOf(s) < 0) setoresAtivos.push(s);
+  });
+  var todosFechados = setoresAtivos.length > 0 && setoresAtivos.every(function(s){ return !!STATE.colapsado[s]; });
+  setoresAtivos.forEach(function(s){ STATE.colapsado[s] = !todosFechados; });
+  salvarEstado();
+  renderMercado();
+}
+
+function onBuscaMercado(){ renderMercado(); }
+
+function adicionarNoMercado(){
+  var v = document.getElementById("busca-mercado").value.trim();
+  if(!v) return;
+  // se já existe na lista, só limpa busca
+  if(STATE.lista[v]){
+    STATE.lista[v].checked = true;
+    if(STATE.mercado[v]){ STATE.mercado[v].feito = false; STATE.mercado[v].naoTem = false; }
+    else STATE.mercado[v] = { feito: false, naoTem: false };
+    document.getElementById("busca-mercado").value = "";
+    document.getElementById("btn-add-mercado").classList.remove("visible");
+    salvarEstado();
+    renderMercado();
+    return;
+  }
+  // Novo item custom
+  var novo = { "Nome do Item": v, "Local em Casa": "Outros", "Setor no Mercado": "Outros", "Cortes": "", custom: true };
+  STATE.itensCustom.push(novo);
+  STATE.lista[v] = { qty: 1, checked: true, fromPratos: [] };
+  STATE.mercado[v] = { feito: false, naoTem: false };
+  document.getElementById("busca-mercado").value = "";
+  document.getElementById("btn-add-mercado").classList.remove("visible");
+  salvarEstado();
+  renderMercado();
+}
+
+function renderMercado(){
+  var busca = document.getElementById("busca-mercado").value.toLowerCase().trim();
+  var emBusca = busca.length > 0;
+  var listaAtiva = todosItens().filter(function(it){
+    var nm = itemNome(it);
+    return STATE.lista[nm] && STATE.lista[nm].checked;
+  });
+  var pend = [], cart = [], naotm = [];
+  listaAtiva.forEach(function(it){
+    var nm = itemNome(it);
+    var m = STATE.mercado[nm] || { feito: false, naoTem: false };
+    if(m.naoTem) naotm.push(it);
+    else if(m.feito) cart.push(it);
+    else pend.push(it);
+  });
+  var pendF = emBusca ? pend.filter(function(it){ return itemNome(it).toLowerCase().indexOf(busca) >= 0; }) : pend;
+  var cartF = emBusca ? cart.filter(function(it){ return itemNome(it).toLowerCase().indexOf(busca) >= 0; }) : cart;
+  var naotmF = emBusca ? naotm.filter(function(it){ return itemNome(it).toLowerCase().indexOf(busca) >= 0; }) : naotm;
+  var nomesAtivos = listaAtiva.map(function(it){ return itemNome(it).toLowerCase(); });
+  var catF = emBusca ? todosItens().filter(function(it){
+    return itemNome(it).toLowerCase().indexOf(busca) >= 0 && nomesAtivos.indexOf(itemNome(it).toLowerCase()) < 0;
+  }) : [];
+  var temMatchAtivo = pendF.length + cartF.length + naotmF.length > 0;
+  var btnAdd = document.getElementById("btn-add-mercado");
+  btnAdd.classList.toggle("visible", emBusca && !temMatchAtivo && !catF.length);
+
+  var mapa = {};
+  pendF.forEach(function(it){ var s = itemSetor(it); if(!mapa[s]) mapa[s] = []; mapa[s].push(it); });
+  var setores = ORDEM_SETORES.filter(function(s){ return mapa[s]; });
+  Object.keys(mapa).forEach(function(s){ if(setores.indexOf(s) < 0) setores.push(s); });
+  var setoresAtivos = Object.keys(mapa);
+  var todosFechados = setoresAtivos.length > 0 && setoresAtivos.every(function(s){ return !!STATE.colapsado[s]; });
+  var btnRet = document.getElementById("btn-retrair");
+  if(btnRet) btnRet.textContent = todosFechados ? "⊞ expandir" : "⊟ retrair";
+
+  var html = "";
+  if(!emBusca && !pend.length && !naotm.length && !cart.length){
+    html += '<div class="empty" style="padding:40px 20px 16px;">Lista vazia 🛒</div>';
+  } else if(!emBusca && !pend.length && !naotm.length){
+    html += '<div class="empty" style="padding:32px 20px 8px;">Tudo no carrinho! 🎉</div>';
+  } else {
+    if(emBusca && !temMatchAtivo && catF.length > 0){
+      html += '<div style="padding:20px 0 4px;font-size:13px;color:var(--text3);">Nenhum resultado na lista do mercado</div>';
+    } else if(emBusca && !temMatchAtivo && !catF.length){
+      html += '<div class="empty" style="padding:32px 20px 8px;">Nenhum item encontrado em lugar nenhum</div>';
+    }
+    setores.forEach(function(s){
+      var coll = !emBusca && !!STATE.colapsado[s];
+      html += '<div class="resultado-cat">'
+        +'<div class="resultado-cat-title" data-setor="'+esc(s)+'">'
+        +'<span>'+esc(s)+'</span>'
+        +'<span style="display:flex;align-items:center;gap:6px;">'
+        +'<span style="font-weight:400;font-size:11px;">'+mapa[s].length+'</span>'
+        +'<span class="cat-chevron'+(coll?' collapsed':'')+'">▼</span>'
+        +'</span></div>';
+      if(!coll){ mapa[s].forEach(function(it){ html += mkResItem(it); }); }
+      html += '</div>';
+    });
+    if(cartF.length > 0){
+      var collCart = !emBusca && !!STATE.colapsado["__carrinho__"];
+      html += '<div class="carrinho-block">'
+        +'<div class="bloco-label carrinho-label" data-setor="__carrinho__">'
+        +'<span>🛒 No carrinho</span>'
+        +'<span style="display:flex;align-items:center;gap:6px;">'
+        +'<span style="font-weight:400;">'+cartF.length+'</span>'
+        +'<span class="cat-chevron'+(collCart?' collapsed':'')+'">▼</span>'
+        +'</span></div>';
+      if(!collCart){ cartF.forEach(function(it){ html += mkResItemCart(it); }); }
+      html += '</div>';
+    }
+    if(naotmF.length > 0){
+      var collN = !emBusca && !!STATE.colapsado["__naotm__"];
+      html += '<div class="naotm-block">'
+        +'<div class="bloco-label naotm-label" data-setor="__naotm__">'
+        +'<span>🚫 Não encontrado</span>'
+        +'<span style="display:flex;align-items:center;gap:6px;">'
+        +'<span style="font-weight:400;">'+naotmF.length+'</span>'
+        +'<span class="cat-chevron'+(collN?' collapsed':'')+'">▼</span>'
+        +'</span></div>';
+      if(!collN){ naotmF.forEach(function(it){ html += mkResItemNaoTem(it); }); }
+      html += '</div>';
+    }
+    if(catF.length > 0){
+      html += '<div class="catalogo-block">'
+        +'<div class="bloco-label catalogo-label">'
+        +'<span>📋 No seu catálogo</span>'
+        +'<span style="font-weight:400;">'+catF.length+'</span>'
+        +'</div>';
+      catF.forEach(function(it){ html += mkResItemCatalogo(it); });
+      html += '</div>';
+    }
+  }
+  document.getElementById("mercado-content").innerHTML = html;
+  bindMercadoEvents();
+  var info = cart.length + " de " + listaAtiva.length + " no carrinho";
+  if(naotm.length > 0) info += " · " + naotm.length + " não encontrado" + (naotm.length>1?"s":"");
+  document.getElementById("mercado-info").textContent = info;
+}
+
+function mkResItem(it){
+  var nm = itemNome(it);
+  var e = STATE.lista[nm] || { qty: 1, fromPratos: [] };
+  var k = chave(nm);
+  var hasPratos = e.fromPratos && e.fromPratos.length > 0;
+  var cortes = getCortesDoItem(it);
+  var teCortes = cortes.length > 1;
+  var html = '<div class="resultado-item'+(hasPratos?' from-prato':'')+(teCortes?' item-com-cortes':'')+'" data-nome="'+esc(nm)+'" id="ri-'+k+'">';
+  html += '<div style="display:flex;align-items:center;width:100%;gap:10px;">'
+    +'<span class="ri-qty">'+pad2(e.qty)+'</span>'
+    +'<div class="ri-nome"><span>'+esc(nm)+'</span>';
+  if(hasPratos){
+    html += '<span class="ri-pratos">'+e.fromPratos.map(function(p){ return '<span class="pp-badge">'+esc(p)+'</span>'; }).join('')+'</span>';
+  }
+  html += '</div>'
+    +'<button class="ri-naotm" data-naotm="'+esc(nm)+'" title="Não tem">✕</button>'
+    +'</div>';
+  if(teCortes){
+    var corteSel = e.corteEscolhido || cortes[0];
+    html += '<div class="cortes-wrap">';
+    cortes.forEach(function(c){
+      var active = c === corteSel;
+      html += '<div class="corte-opt'+(active?' active':'')+'" data-corte-set="'+esc(nm)+'" data-corte="'+esc(c)+'">'
+        +'<div class="corte-radio"></div><span>'+esc(c)+'</span></div>';
+    });
+    html += '</div><div class="corte-helper">escolha pelo preço/promoção</div>';
+  }
+  html += '</div>';
+  return html;
+}
+
+function mkResItemCart(it){
+  var nm = itemNome(it);
+  var e = STATE.lista[nm] || { qty: 1 };
+  var k = chave(nm);
+  return '<div class="resultado-item no-carrinho" data-nome="'+esc(nm)+'" id="ri-'+k+'">'
+    +'<span class="ri-qty">'+pad2(e.qty)+'</span>'
+    +'<span class="ri-nome"><span>'+esc(nm)+(e.corteEscolhido?' ('+esc(e.corteEscolhido)+')':'')+'</span></span>'
+    +'</div>';
+}
+
+function mkResItemNaoTem(it){
+  var nm = itemNome(it);
+  var e = STATE.lista[nm] || { qty: 1 };
+  var k = chave(nm);
+  return '<div class="resultado-item naotm-item" data-nome="'+esc(nm)+'" id="ri-'+k+'">'
+    +'<span class="ri-qty">'+pad2(e.qty)+'</span>'
+    +'<span class="ri-nome"><span>'+esc(nm)+'</span></span>'
+    +'<button class="ri-volta" data-volta="'+esc(nm)+'" title="Voltar">↩</button>'
+    +'</div>';
+}
+
+function mkResItemCatalogo(it){
+  var nm = itemNome(it);
+  var k = chave(nm);
+  return '<div class="resultado-item catalogo-item" id="ri-cat-'+k+'">'
+    +'<span class="ri-setor-badge">'+esc(itemSetor(it))+'</span>'
+    +'<span class="ri-nome"><span>'+esc(nm)+'</span></span>'
+    +'<button class="ri-add" data-addcat="'+esc(nm)+'" title="Adicionar à lista">+</button>'
+    +'</div>';
+}
+
+function adicionarDoCatalogo(nome){
+  if(!STATE.lista[nome]) STATE.lista[nome] = { qty: 1, checked: true, fromPratos: [] };
+  else STATE.lista[nome].checked = true;
+  STATE.mercado[nome] = { feito: false, naoTem: false };
+  salvarEstado();
+  renderMercado();
+}
+
+function selecionarCorte(nome, corte){
+  if(!STATE.lista[nome]) return;
+  STATE.lista[nome].corteEscolhido = corte;
+  salvarEstado();
+  renderMercado();
+}
+
+function bindMercadoEvents(){
+  document.querySelectorAll("#mercado-content [data-setor]").forEach(function(el){
+    el.addEventListener("click", function(e){
+      e.stopPropagation();
+      STATE.colapsado[el.dataset.setor] = !STATE.colapsado[el.dataset.setor];
+      salvarEstado();
+      renderMercado();
+    });
+  });
+  document.querySelectorAll("#mercado-content [data-addcat]").forEach(function(el){
+    el.addEventListener("click", function(e){ e.stopPropagation(); adicionarDoCatalogo(el.dataset.addcat); });
+  });
+  document.querySelectorAll("#mercado-content [data-corte-set]").forEach(function(el){
+    el.addEventListener("click", function(e){ e.stopPropagation(); selecionarCorte(el.dataset.corteSet, el.dataset.corte); });
+  });
+  document.querySelectorAll("#mercado-content .resultado-item").forEach(function(el){
+    var sY, sX, mv;
+    el.addEventListener("touchstart", function(e){ sY = e.touches[0].clientY; sX = e.touches[0].clientX; mv = false; }, { passive: true });
+    el.addEventListener("touchmove", function(e){
+      if(Math.abs(e.touches[0].clientY - sY) > 8 || Math.abs(e.touches[0].clientX - sX) > 8) mv = true;
+    }, { passive: true });
+    el.addEventListener("touchend", function(e){
+      if(mv) return;
+      e.preventDefault();
+      handleMercadoClick(e, el);
+    });
+    el.addEventListener("click", function(e){ handleMercadoClick(e, el); });
+  });
+}
+
+function handleMercadoClick(e, el){
+  if(el.classList.contains("catalogo-item")){
+    var addBtn = el.querySelector("[data-addcat]");
+    if(addBtn) adicionarDoCatalogo(addBtn.dataset.addcat);
+    return;
+  }
+  if(e.target.closest("[data-corte-set]")) return;
+  var naotmBtn = e.target.closest("[data-naotm]");
+  var voltaBtn = e.target.closest("[data-volta]");
+  if(naotmBtn){ toggleNaoTem(naotmBtn.dataset.naotm); return; }
+  if(voltaBtn){ voltarDaNaoTem(voltaBtn.dataset.volta); return; }
+  if(e.target.closest("button")) return;
+  var sc = window.scrollY;
+  if(el.classList.contains("naotm-item")){ voltarDaNaoTem(el.dataset.nome); }
+  else { toggleFeito(el.dataset.nome); }
+  requestAnimationFrame(function(){ window.scrollTo(0, sc); });
+}
+
+function toggleFeito(nome){
+  if(!STATE.mercado[nome]) STATE.mercado[nome] = { feito: false, naoTem: false };
+  STATE.mercado[nome].feito = !STATE.mercado[nome].feito;
+  salvarEstado();
+  renderMercado();
+}
+
+function toggleNaoTem(nome){
+  if(!STATE.mercado[nome]) STATE.mercado[nome] = { feito: false, naoTem: false };
+  STATE.mercado[nome].naoTem = true;
+  STATE.mercado[nome].feito = false;
+  salvarEstado();
+  renderMercado();
+}
+
+function voltarDaNaoTem(nome){
+  if(!STATE.mercado[nome]) return;
+  STATE.mercado[nome].naoTem = false;
+  salvarEstado();
+  renderMercado();
+}
+
+// ============================================================
+// COPIAR PRA WHATSAPP
+// ============================================================
+function copiarZap(){
+  var listaAtiva = todosItens().filter(function(it){
+    var nm = itemNome(it);
+    return STATE.lista[nm] && STATE.lista[nm].checked;
+  });
+  if(!listaAtiva.length){ alert("Lista vazia."); return; }
+  var pend = listaAtiva.filter(function(it){ var nm = itemNome(it); var m = STATE.mercado[nm]; return !m || (!m.feito && !m.naoTem); });
+  var naotm = listaAtiva.filter(function(it){ var nm = itemNome(it); var m = STATE.mercado[nm]; return m && m.naoTem; });
+  var data = new Date().toLocaleDateString("pt-BR");
+  var txt = "🛒 *Lista de compras*\n_" + data + "_";
+  if(Object.keys(STATE.cardapioSel).length > 0){
+    txt += "\n_" + Object.keys(STATE.cardapioSel).length + " pratos no cardápio_";
+  }
+  if(pend.length > 0){
+    var mapa = {};
+    pend.forEach(function(it){ var s = itemSetor(it); if(!mapa[s]) mapa[s] = []; mapa[s].push(it); });
+    var setores = ORDEM_SETORES.filter(function(s){ return mapa[s]; });
+    Object.keys(mapa).forEach(function(s){ if(setores.indexOf(s) < 0) setores.push(s); });
+    setores.forEach(function(s){
+      txt += "\n\n*" + s + "*\n";
+      txt += mapa[s].map(function(it){
+        var nm = itemNome(it);
+        var e = STATE.lista[nm];
+        var corte = e.corteEscolhido ? " (" + e.corteEscolhido + ")" : "";
+        return "• " + pad2(e.qty) + " - " + nm + corte;
+      }).join("\n");
+    });
+  }
+  if(naotm.length > 0){
+    txt += "\n\n*Não encontrado*\n";
+    txt += naotm.map(function(it){ var nm = itemNome(it); var e = STATE.lista[nm]; return "• " + pad2(e.qty) + " - " + nm; }).join("\n");
+  }
+  var btn = document.getElementById("btn-zap");
+  function ok(){ btn.textContent = "✓ Copiado!"; setTimeout(function(){ btn.textContent = "Copiar p/ WhatsApp"; }, 2500); }
+  function fb(){
+    var ta = document.createElement("textarea");
+    ta.value = txt; ta.style.cssText = "position:fixed;top:0;left:0;opacity:0;";
+    document.body.appendChild(ta); ta.focus(); ta.select();
+    try { document.execCommand("copy"); ok(); } catch(e){ alert(txt); }
+    document.body.removeChild(ta);
+  }
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt).then(ok).catch(fb);
+  } else { fb(); }
+}
+
+// ============================================================
+// MODAL (mantido pra compatibilidade futura, não usado por padrão)
+// ============================================================
+function fecharModal(){ document.getElementById("modal").classList.remove("open"); }
+function fecharModalFora(e){ if(e.target === document.getElementById("modal")) fecharModal(); }
+function importarColado(){ fecharModal(); }
+
+// ============================================================
+// INIT
+// ============================================================
+function init(){
+  carregarEstado();
+  carregarDados(false).then(function(){
+    renderCardapio();
+    // Se já tem cardápio escolhido em sessão anterior, vai pra lista direto
+    var telaInicial = STATE.telaAtiva || "cardapio";
+    if(telaInicial === "lista" || telaInicial === "mercado"){
+      renderLista();
+      if(telaInicial === "mercado") renderMercado();
+      showTela(telaInicial);
+    } else if(telaInicial === "sugestoes"){
+      renderSugestoes();
+      showTela("sugestoes");
+    } else {
+      showTela("cardapio");
+    }
+  }).catch(function(err){
+    console.error("Erro ao carregar dados:", err);
+    var isFileProto = window.location.protocol === "file:";
+    var msg = '<div class="erro">'
+      + '<b>Erro ao carregar dados</b><br>'
+      + '<code style="font-size:11px;display:block;margin:8px 0;padding:6px 8px;background:#fff;border-radius:4px;border:1px solid #FECACA;color:#9B1C1C;word-break:break-all;">' + esc(err.message || err.toString()) + '</code>';
+    if(isFileProto){
+      msg += '<div style="font-size:13px;margin-top:10px;line-height:1.5;color:#444;">'
+        + '<b>Possível causa:</b> você abriu o arquivo direto do disco (file://). '
+        + 'Alguns navegadores bloqueiam requests externos nesse modo. '
+        + 'Tenta uma destas opções:'
+        + '<ul style="margin:6px 0 0 18px;font-size:12px;">'
+        + '<li>Hospedar o HTML no Google Drive como site (compartilhamento como página web)</li>'
+        + '<li>Servir via servidor local: <code>python3 -m http.server</code> na pasta</li>'
+        + '<li>Usar GitHub Pages ou similar</li>'
+        + '</ul></div>';
+    } else {
+      msg += '<div style="font-size:13px;margin-top:10px;line-height:1.5;color:#444;">Abre o console do navegador (F12) pra ver detalhes técnicos.</div>';
+    }
+    msg += '<button onclick="location.reload()" style="margin-top:10px;">Recarregar página</button>'
+      + ' <button onclick="localStorage.clear();location.reload()" style="margin-top:10px;background:#666;">Limpar cache</button>'
+      + '</div>';
+    document.getElementById("cardapio-content").innerHTML = msg;
+  });
+}
+
+init();
+</script>
+</body>
+</html>
