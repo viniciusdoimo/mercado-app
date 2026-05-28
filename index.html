@@ -31,7 +31,7 @@
   .btn-add-new{padding:11px 16px;background:var(--accent);color:var(--accent-fg);border:none;border-radius:var(--radius);font-size:15px;font-weight:600;cursor:pointer;white-space:nowrap;display:none;}
   .btn-add-new.visible{display:block;}
 
-  .content{padding:14px 20px 200px;}
+  .content{padding:14px 20px 120px;}
 
   /* Banner cardápio ativo (no topo da lista) */
   .banner-cardapio{background:var(--orange-bg);border-bottom:1px solid var(--orange-border);padding:10px 20px;display:flex;align-items:center;gap:8px;font-size:13px;color:var(--orange);}
@@ -58,18 +58,6 @@
   .cat-bloco{margin-bottom:18px;}
   .cat-head{font-size:11px;font-family:'DM Mono',monospace;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;padding-bottom:6px;border-bottom:1px solid var(--border);margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;}
 
-  /* Sugestões mensais */
-  .sug-intro{padding:0 20px 12px;font-size:13px;color:var(--text2);line-height:1.45;}
-  .sug-intro b{font-weight:500;color:var(--text);}
-  .sug-item{display:flex;align-items:center;gap:8px;padding:11px 12px;border:1px solid var(--border);border-radius:var(--radius);margin-bottom:6px;background:var(--surface);}
-  .sug-item .sug-info{flex:1;min-width:0;}
-  .sug-nome{font-size:14px;font-weight:500;}
-  .sug-pratos{font-size:11px;color:var(--text3);margin-top:3px;}
-  .sug-pratos .sug-badge{background:#FAC775;color:#4A1B0C;border-radius:4px;padding:1px 6px;font-family:'DM Mono',monospace;display:inline-block;margin-right:3px;font-size:10px;}
-  .sug-btns{display:flex;gap:4px;flex-shrink:0;}
-  .sug-btn{font-size:11px;padding:6px 10px;border-radius:4px;font-family:'DM Sans',sans-serif;cursor:pointer;border:1px solid var(--border2);background:transparent;color:var(--text2);white-space:nowrap;}
-  .sug-btn.sug-tenho.active{border-color:var(--green);background:var(--green-bg);color:var(--green);}
-  .sug-btn.sug-comprar.active{border-color:var(--red);background:var(--red-bg);color:var(--red);}
 
   /* Lista — categorias e itens */
   .cat-block{margin-bottom:24px;}
@@ -77,10 +65,13 @@
   .cat-label:active{opacity:.65;}
   .fora-block{margin-top:32px;}
   .fora-label{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-family:'DM Mono',monospace;padding-bottom:6px;border-bottom:2px solid var(--red-border);margin-bottom:6px;color:var(--red);display:flex;justify-content:space-between;align-items:center;cursor:pointer;user-select:none;}
+  .fora-label.catalogo-label{border-bottom-color:var(--border2);border-bottom-style:dashed;color:var(--text2);}
 
   .item{display:flex;align-items:center;gap:12px;padding:13px 12px;border-radius:var(--radius-sm);cursor:pointer;user-select:none;border:1px solid var(--border);background:var(--surface);margin-bottom:2px;touch-action:pan-y;}
   .item.from-prato{background:var(--orange-bg);border-color:var(--orange-border);}
   .item.desmarcado{background:var(--red-bg);border-color:var(--red-border);}
+  .item.catalogo{background:var(--surface2);border-color:var(--border);opacity:.95;}
+  .item.catalogo .item-name>span:first-child{color:var(--text2);}
   .item.pressed{opacity:.7;}
   .item-name{flex:1;font-size:16px;line-height:1.4;display:flex;flex-direction:column;gap:3px;}
   .item-name .item-pratos{font-size:10px;font-family:'DM Mono',monospace;}
@@ -96,10 +87,10 @@
   .cat-chevron.collapsed{transform:rotate(-90deg);}
 
   /* Footer */
-  .footer{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);padding:10px 12px 80px;}
-  .footer-info{font-size:12px;color:var(--text3);margin-bottom:8px;font-family:'DM Mono',monospace;}
-  .footer-btns{display:flex;gap:6px;}
-  .btn{flex:1;padding:11px 6px;border-radius:var(--radius);font-size:14px;font-weight:500;cursor:pointer;border:none;transition:all .15s;font-family:'DM Sans',sans-serif;white-space:nowrap;min-width:0;}
+  .footer{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);padding:6px 10px 14px;}
+  .footer-info{font-size:11px;color:var(--text3);margin-bottom:4px;font-family:'DM Mono',monospace;}
+  .footer-btns{display:flex;gap:5px;}
+  .btn{flex:1;padding:7px 5px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;cursor:pointer;border:none;transition:all .15s;font-family:'DM Sans',sans-serif;white-space:nowrap;min-width:0;}
   .btn-ghost{background:var(--surface2);border:1px solid var(--border);color:var(--text2);}
   .btn-primary{background:var(--accent);color:var(--accent-fg);}
   .btn-primary:active{transform:scale(.98);}
@@ -157,8 +148,68 @@
   .ri-add{width:38px;height:38px;border-radius:8px;border:1.5px solid var(--border2);background:var(--surface);flex-shrink:0;display:flex;align-items:center;justify-content:center;color:var(--text2);font-size:22px;font-weight:300;cursor:pointer;}
   .empty{text-align:center;padding:48px 20px;color:var(--text3);font-size:16px;}
 
-  /* Loading */
+  /* HOME — tela inicial */
+  .home-section{padding:14px 20px;}
+  .home-section h2{font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);font-family:'DM Mono',monospace;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;}
+  .home-section h2 .count{font-size:11px;color:var(--text3);}
+
+  .home-inbox-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;cursor:pointer;}
+  .home-inbox-card:active{opacity:.7;}
+  .home-inbox-card .inbox-resumo{font-size:14px;color:var(--text2);line-height:1.4;}
+  .home-inbox-card .inbox-resumo b{color:var(--text);font-weight:500;}
+  .home-inbox-empty{font-size:13px;color:var(--text3);font-style:italic;}
+
+  .home-nova-grid{display:flex;flex-direction:column;gap:8px;}
+  .home-nova-btn{display:flex;align-items:center;gap:12px;padding:14px 16px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);cursor:pointer;font-family:'DM Sans',sans-serif;font-size:15px;color:var(--text);text-align:left;}
+  .home-nova-btn:active{opacity:.7;}
+  .home-nova-btn .ic{font-size:20px;width:24px;text-align:center;flex-shrink:0;}
+  .home-nova-btn .lb{flex:1;font-weight:500;}
+  .home-nova-btn .sub{font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;}
+
+  .lista-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;margin-bottom:6px;}
+  .lista-card .lc-top{display:flex;align-items:center;gap:8px;margin-bottom:4px;}
+  .lista-card .lc-tipo{font-size:10px;font-family:'DM Mono',monospace;background:var(--surface2);color:var(--text2);padding:2px 8px;border-radius:4px;text-transform:uppercase;letter-spacing:.05em;}
+  .lista-card .lc-tipo.semanal{background:#E1F5EE;color:#0F6E56;}
+  .lista-card .lc-tipo.mensal{background:#E6F1FB;color:#0C447C;}
+  .lista-card .lc-tipo.livre{background:#FAEEDA;color:#854F0B;}
+  .lista-card .lc-nome{font-size:14px;font-weight:500;flex:1;}
+  .lista-card .lc-meta{font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;margin-bottom:8px;}
+  .lista-card .lc-btns{display:flex;gap:6px;}
+  .lista-card .lc-btn{flex:1;padding:8px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface2);color:var(--text2);font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;}
+  .lista-card .lc-btn:active{opacity:.7;}
+  .lista-card .lc-btn.lc-mercado{background:var(--accent);color:var(--accent-fg);border-color:var(--accent);}
+  .lista-card .lc-btn.lc-del{flex:0 0 36px;color:var(--red);border-color:var(--red-border);}
+
+  .hist-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-bottom:1px solid var(--border);font-size:13px;}
+  .hist-item:last-child{border-bottom:none;}
+  .hist-item .hi-tipo{font-size:10px;font-family:'DM Mono',monospace;color:var(--text3);text-transform:uppercase;flex-shrink:0;}
+  .hist-item .hi-nome{flex:1;}
+  .hist-item .hi-data{font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;flex-shrink:0;}
+
+  /* Modal de perfil — primeira abertura */
+  .perfil-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;align-items:center;justify-content:center;padding:20px;}
+  .perfil-overlay.open{display:flex;}
+  .perfil-modal{background:var(--surface);border-radius:16px;padding:24px;max-width:380px;width:100%;}
+  .perfil-modal h2{font-size:18px;font-weight:600;margin-bottom:6px;}
+  .perfil-modal p{font-size:14px;color:var(--text2);margin-bottom:18px;line-height:1.5;}
+  .perfil-opcoes{display:flex;flex-direction:column;gap:10px;}
+  .perfil-opt{padding:14px 16px;border:1.5px solid var(--border);border-radius:var(--radius);background:var(--surface);cursor:pointer;font-size:15px;font-weight:500;text-align:left;color:var(--text);transition:all .15s;font-family:'DM Sans',sans-serif;}
+  .perfil-opt:active{transform:scale(.98);}
+  .perfil-opt:hover{border-color:var(--text);background:var(--surface2);}
+
+  /* Badge do autor da Inbox */
+  .ri-autor, .item-autor{font-size:9px;font-family:'DM Mono',monospace;background:#E1F5EE;color:#0F6E56;border-radius:4px;padding:1px 5px;margin-right:3px;}
+
+  /* Trocar perfil */
+  .perfil-link{font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;text-decoration:underline;cursor:pointer;background:none;border:none;padding:0;}
+
+  /* Loading inline */
   .loading{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 20px;color:var(--text3);font-size:14px;gap:12px;}
+  /* Loading overlay (modal de espera) */
+  .load-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:400;align-items:center;justify-content:center;}
+  .load-overlay.open{display:flex;}
+  .load-box{background:var(--surface);border-radius:var(--radius);padding:20px 28px;display:flex;flex-direction:column;align-items:center;gap:12px;min-width:160px;}
+  .load-msg{font-size:13px;color:var(--text2);font-family:'DM Sans',sans-serif;text-align:center;}
   .spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--text);border-radius:50%;animation:spin 1s linear infinite;}
   @keyframes spin{to{transform:rotate(360deg);}}
 
@@ -168,15 +219,137 @@
 </head>
 <body>
 
+<!-- ============ TELA HOME ============ -->
+<div id="tela-home">
+  <div class="header">
+    <div class="header-top">
+      <div>
+        <div class="header-title">Mercado</div>
+        <div class="header-sub" id="home-sub">
+          <button class="perfil-link" onclick="trocarPerfil()">👤 <span data-perfil-label>?</span></button>
+        </div>
+      </div>
+      <button class="btn-pular" onclick="atualizarDados()" title="Recarrega da planilha">🔄</button>
+    </div>
+  </div>
+
+  <div class="home-section">
+    <h2>📥 Lembrados <span class="count" id="home-inbox-count"></span></h2>
+    <div class="home-inbox-card" onclick="irParaInbox()">
+      <div class="inbox-resumo" id="home-inbox-resumo">carregando…</div>
+    </div>
+  </div>
+
+  <div class="home-section">
+    <h2>➕ Nova compra</h2>
+    <div class="home-nova-grid">
+      <button class="home-nova-btn" onclick="novaLista('semanal')">
+        <span class="ic">🍽️</span>
+        <span class="lb">Compra Semanal</span>
+      </button>
+      <button class="home-nova-btn" onclick="novaLista('mensal')">
+        <span class="ic">📦</span>
+        <span class="lb">Compra Mensal</span>
+      </button>
+      <button class="home-nova-btn" onclick="novaLista('livre')">
+        <span class="ic">⚡</span>
+        <span class="lb">Lista Livre</span>
+        <span class="sub">opcional: incluir Lembrados</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="home-section" id="home-listas-section">
+    <h2>📋 Listas salvas <span class="count" id="home-listas-count"></span></h2>
+    <div id="home-listas-content"></div>
+  </div>
+
+  <div class="home-section" id="home-historico-section">
+    <h2>📊 Histórico recente</h2>
+    <div id="home-historico-content" style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);"></div>
+    <div id="home-ultima" style="font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;margin-top:8px;text-align:center;"></div>
+  </div>
+</div>
+
+<!-- ============ TELA INBOX ============ -->
+<div id="tela-inbox" style="display:none;">
+  <div class="header">
+    <div class="header-top">
+      <div>
+        <div class="header-title">Lembrados</div>
+        <div class="header-sub">itens pendentes (compartilhado)</div>
+      </div>
+      <button class="btn-pular" onclick="voltarParaHome()">← home</button>
+    </div>
+    <div class="search-wrap">
+      <input type="search" class="search-input" id="busca-inbox" placeholder="Adicionar novo item..." oninput="onBuscaInbox()" autocomplete="off">
+      <button class="btn-add-new" id="btn-add-inbox" onclick="addItemInbox()">+ Adicionar</button>
+    </div>
+  </div>
+  <div class="content" id="inbox-content"></div>
+</div>
+
+<!-- ============ LOADING OVERLAY ============ -->
+<div class="load-overlay" id="load-overlay">
+  <div class="load-box">
+    <div class="spinner"></div>
+    <div class="load-msg" id="load-msg">Aguarde…</div>
+  </div>
+</div>
+
+<!-- ============ MODAL DE INPUT (nome + checkbox opcional) ============ -->
+<div class="perfil-overlay" id="input-overlay">
+  <div class="perfil-modal">
+    <h2 id="input-titulo">…</h2>
+    <p id="input-texto" style="white-space:pre-line;"></p>
+    <input type="text" id="input-campo" placeholder="" style="width:100%;padding:11px 14px;font-size:15px;border:1px solid var(--border);border-radius:var(--radius);outline:none;font-family:'DM Sans',sans-serif;margin-bottom:14px;">
+    <label id="input-check-wrap" style="display:flex;align-items:center;gap:8px;font-size:14px;color:var(--text2);margin-bottom:16px;cursor:pointer;user-select:none;">
+      <input type="checkbox" id="input-check" style="width:18px;height:18px;cursor:pointer;">
+      <span id="input-check-label">…</span>
+    </label>
+    <div class="perfil-opcoes">
+      <button class="perfil-opt" style="border-color:var(--accent);background:var(--accent);color:var(--accent-fg);" onclick="_inputConfirma(true)">Continuar</button>
+      <button class="perfil-opt" onclick="_inputConfirma(false)">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ MODAL DE CONFIRMAÇÃO ============ -->
+<div class="perfil-overlay" id="confirma-overlay">
+  <div class="perfil-modal">
+    <h2 id="confirma-titulo">Confirmar</h2>
+    <p id="confirma-texto" style="white-space:pre-line;"></p>
+    <div class="perfil-opcoes" id="confirma-btns"></div>
+  </div>
+</div>
+
+<!-- ============ MODAL DE PERFIL ============ -->
+<div class="perfil-overlay" id="perfil-overlay">
+  <div class="perfil-modal">
+    <h2>Como vamos te chamar?</h2>
+    <p>Pra identificar quem adicionou cada item. Você pode trocar depois.</p>
+    <input type="text" id="perfil-input" placeholder="Seu nome ou apelido" maxlength="20" style="width:100%;padding:11px 14px;font-size:15px;border:1px solid var(--border);border-radius:var(--radius);outline:none;font-family:'DM Sans',sans-serif;margin-bottom:14px;">
+    <div class="perfil-opcoes">
+      <button class="perfil-opt" style="border-color:var(--accent);background:var(--accent);color:var(--accent-fg);" onclick="escolherPerfilDoInput()">Continuar</button>
+    </div>
+  </div>
+</div>
+
 <!-- ============ TELA CARDÁPIO ============ -->
 <div id="tela-cardapio">
   <div class="header">
     <div class="header-top">
       <div>
         <div class="header-title">Cardápio da semana</div>
-        <div class="header-sub" id="cardapio-sub">escolha os pratos</div>
+        <div class="header-sub" id="cardapio-sub">
+          <button class="perfil-link" onclick="trocarPerfil()">👤 <span data-perfil-label>?</span></button>
+          · escolha os pratos
+        </div>
       </div>
-      <button class="btn-pular" onclick="pularCardapio()">pular →</button>
+      <div style="display:flex;gap:6px;">
+        <button class="btn-pular" onclick="voltarParaHome()" title="Voltar">← home</button>
+        <button class="btn-pular" onclick="pularCardapio()">pular →</button>
+      </div>
     </div>
     <div class="toggle-vista">
       <div class="toggle-vista-inner">
@@ -192,42 +365,24 @@
     <div class="footer-info" id="cardapio-info">0 escolhidos</div>
     <div class="footer-btns">
       <button class="btn btn-ghost" onclick="limparCardapio()">Limpar</button>
-      <button class="btn btn-primary" id="btn-cardapio-prox" onclick="irParaSugestoes()" disabled>Próximo →</button>
+      <button class="btn btn-primary" id="btn-cardapio-prox" onclick="irParaLista_doCardapio()" disabled>Próximo →</button>
     </div>
   </div>
 </div>
 
-<!-- ============ TELA SUGESTÕES ============ -->
-<div id="tela-sugestoes" style="display:none;">
-  <div class="header">
-    <div class="header-top">
-      <div>
-        <div class="header-title">Confere se tem em casa</div>
-        <div class="header-sub" id="sugestoes-sub">itens mensais dos pratos</div>
-      </div>
-    </div>
-  </div>
-  <div class="sug-intro">
-    Itens semanais dos pratos (carnes, verduras) já entraram na lista. Aqui são só os <b>mensais</b> que vale conferir — marca "tenho" se já tá em casa, ou "+ comprar" pra ir pra lista.
-  </div>
-  <div class="content" id="sugestoes-content"></div>
-  <div class="footer">
-    <div class="footer-info" id="sugestoes-info"></div>
-    <div class="footer-btns">
-      <button class="btn btn-ghost" onclick="voltarParaCardapio()">← Cardápio</button>
-      <button class="btn btn-primary" onclick="irParaLista()">Ir pra lista →</button>
-    </div>
-  </div>
-</div>
 
 <!-- ============ TELA LISTA ============ -->
 <div id="tela-lista" style="display:none;">
   <div class="header">
     <div class="header-top">
       <div>
-        <div class="header-title">Minha Lista</div>
-        <div class="header-sub" id="lista-sub">toque para retirar da lista</div>
+        <div class="header-title" id="lista-title">Minha Lista</div>
+        <div class="header-sub" id="lista-sub">
+          <button class="perfil-link" onclick="trocarPerfil()">👤 <span data-perfil-label>?</span></button>
+          · toque para retirar
+        </div>
       </div>
+      <button class="btn-pular" onclick="voltarParaHome()" title="Voltar">← home</button>
     </div>
     <div id="banner-cardapio-container"></div>
     <div class="search-wrap">
@@ -239,8 +394,8 @@
   <div class="footer">
     <div class="footer-info" id="lista-info"></div>
     <div class="footer-btns">
-      <button class="btn btn-ghost" onclick="voltarParaCardapio()">← Cardápio</button>
-      <button class="btn btn-ghost" onclick="resetarTudo()">Resetar</button>
+      <button class="btn btn-ghost" onclick="voltarParaHome()">← home</button>
+      <button class="btn btn-ghost" onclick="salvarESair()" title="Salvar lista e voltar">💾 salvar</button>
       <button class="btn btn-primary" onclick="irParaMercado()">Mercado →</button>
     </div>
   </div>
@@ -267,7 +422,10 @@
         <div class="header-title">No Mercado</div>
         <div class="header-sub" id="mercado-sub"></div>
       </div>
-      <button class="btn-pular" onclick="toggleRetrairSetores()" id="btn-retrair">⊟ retrair</button>
+      <div style="display:flex;gap:6px;">
+        <button class="btn-pular" onclick="voltarParaHome()" title="Voltar">← home</button>
+        <button class="btn-pular" onclick="toggleRetrairSetores()" id="btn-retrair">⊟</button>
+      </div>
     </div>
     <div class="search-wrap">
       <input type="search" class="search-input" id="busca-mercado" placeholder="Buscar ou adicionar item..." oninput="onBuscaMercado()" autocomplete="off">
@@ -278,8 +436,10 @@
   <div class="footer">
     <div class="footer-info" id="mercado-info"></div>
     <div class="footer-btns">
-      <button class="btn btn-ghost" onclick="voltarParaLista()">← Lista</button>
-      <button class="btn btn-primary" id="btn-zap" onclick="copiarZap()">Copiar p/ WhatsApp</button>
+      <button class="btn btn-ghost" onclick="voltarParaLista()">←</button>
+      <button class="btn btn-ghost" onclick="copiarZap()" title="WhatsApp">📋</button>
+      <button class="btn btn-ghost" onclick="proximoMercado()" title="Salva e volta pra editar">→ próximo mercado</button>
+      <button class="btn btn-primary" onclick="finalizarCompra()">✓ Finalizar</button>
     </div>
   </div>
 </div>
@@ -289,11 +449,51 @@
 // CONFIG — URLs dos CSVs publicados no Google Sheets
 // ============================================================
 var CSV_URLS = {
-  itens: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQaewGdjNzsgVI4Jhni5-uHNuHdsZ_uNoIJxlWOWi88Fm3_PJQ0I57J1awb8-eGWQ/pub?gid=1366167683&single=true&output=csv",
-  pratos: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQaewGdjNzsgVI4Jhni5-uHNuHdsZ_uNoIJxlWOWi88Fm3_PJQ0I57J1awb8-eGWQ/pub?gid=264078528&single=true&output=csv",
-  receitas: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQaewGdjNzsgVI4Jhni5-uHNuHdsZ_uNoIJxlWOWi88Fm3_PJQ0I57J1awb8-eGWQ/pub?gid=1607210539&single=true&output=csv",
-  cardapio: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQaewGdjNzsgVI4Jhni5-uHNuHdsZ_uNoIJxlWOWi88Fm3_PJQ0I57J1awb8-eGWQ/pub?gid=1866996234&single=true&output=csv"
+  itens: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQm_oWvvBh_BeRZrc0NGv2rdpjdmsnBf5XN59MpCkiJVW2G37KO9x94xP39BMb6P9aOdosrsdgSzD9f/pub?gid=1366167683&single=true&output=csv",
+  pratos: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQm_oWvvBh_BeRZrc0NGv2rdpjdmsnBf5XN59MpCkiJVW2G37KO9x94xP39BMb6P9aOdosrsdgSzD9f/pub?gid=264078528&single=true&output=csv",
+  receitas: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQm_oWvvBh_BeRZrc0NGv2rdpjdmsnBf5XN59MpCkiJVW2G37KO9x94xP39BMb6P9aOdosrsdgSzD9f/pub?gid=1607210539&single=true&output=csv",
+  cardapio: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQm_oWvvBh_BeRZrc0NGv2rdpjdmsnBf5XN59MpCkiJVW2G37KO9x94xP39BMb6P9aOdosrsdgSzD9f/pub?gid=1866996234&single=true&output=csv"
 };
+
+// Apps Script Web App — backend pra Inbox / Sessões / Histórico
+var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx661DRIobZg_fTFQeXnczAXJeF6DnWdt5fxM_WlU7xuXx3uVnO7RyXjPnRQEEfyXN8/exec";
+var APPS_SCRIPT_TOKEN = "mlist-x9k2-2026";
+
+// Helpers de chamada ao Apps Script
+function apiGet(action, params){
+  var url = APPS_SCRIPT_URL + "?action=" + encodeURIComponent(action) + "&token=" + encodeURIComponent(APPS_SCRIPT_TOKEN);
+  if(params){
+    Object.keys(params).forEach(function(k){
+      url += "&" + encodeURIComponent(k) + "=" + encodeURIComponent(params[k]);
+    });
+  }
+  return fetch(url, { cache: "no-store", redirect: "follow" }).then(function(r){
+    if(!r.ok) throw new Error("HTTP " + r.status);
+    return r.json();
+  }).then(function(data){
+    if(data && data.error) throw new Error(data.error);
+    return data;
+  });
+}
+
+function apiPost(action, body){
+  body = body || {};
+  body.action = action;
+  body.token = APPS_SCRIPT_TOKEN;
+  // text/plain evita CORS preflight (simple request)
+  return fetch(APPS_SCRIPT_URL, {
+    method: "POST",
+    redirect: "follow",
+    headers: { "Content-Type": "text/plain;charset=utf-8" },
+    body: JSON.stringify(body)
+  }).then(function(r){
+    if(!r.ok) throw new Error("HTTP " + r.status);
+    return r.json();
+  }).then(function(data){
+    if(data && data.error) throw new Error(data.error);
+    return data;
+  });
+}
 
 // Setores universais (sempre disponíveis em casa, não viram sugestão)
 var TEMPEROS_UNIVERSAIS = new Set([
@@ -315,9 +515,17 @@ var STATE_KEY = "mercado_estado_v1";
 // ============================================================
 var DADOS = { itens: [], pratos: [], receitas: [], cardapio: [] };
 var STATE = {
+  perfil: null,         // "Vini" | "Ce"
+  inbox: [],            // itens da Inbox compartilhada
+  listas: [],           // listas salvas (cache do backend)
+  historico: [],        // últimas 3 compras finalizadas
+  listaAtivaId: null,   // id da lista em edição
+  tipoListaAtiva: null, // "semanal" | "mensal" | "livre"
+  nomeListaAtiva: "",   // nome da lista em edição
+  incluiInbox: true,    // se true, lista atual mostra Inbox
   cardapioSel: {},      // { "Prato": true }
-  sugRespostas: {},     // { "Item": "tenho" | "comprar" }
-  lista: {},            // { "Item": { qty, checked, fromPratos: [...], corteEscolhido } }
+  sugSelecionadas: {},  // sugestões mensais marcadas
+  lista: {},            // { "Item": { qty, checked, fromPratos, corteEscolhido, fromInbox } }
   mercado: {},          // { "Item": { feito, naoTem } }
   vistaCardapio: "semana",
   itensCustom: [],
@@ -327,6 +535,7 @@ var STATE = {
 };
 
 function salvarEstado(){
+  STATE.ultimaEdicao = Date.now();
   try { localStorage.setItem(STATE_KEY, JSON.stringify(STATE)); } catch(e){}
 }
 function carregarEstado(){
@@ -380,12 +589,9 @@ function fetchCSV(url, label){
     return r.text();
   }).then(function(text){
     if(text.indexOf("<!DOCTYPE") === 0 || text.indexOf("<html") >= 0){
-      throw new Error("[" + label + "] resposta veio como HTML (talvez sem permissão pública)");
+      throw new Error("[" + label + "] resposta veio como HTML (sem permissão pública?)");
     }
     return parseCSV(text);
-  }).catch(function(e){
-    e.message = "[" + label + "] " + e.message;
-    throw e;
   });
 }
 
@@ -463,7 +669,7 @@ function itemLocal(it){
 // TROCAR DE TELA
 // ============================================================
 function showTela(nome){
-  ["cardapio","sugestoes","lista","mercado"].forEach(function(t){
+  ["home","inbox","cardapio","lista","mercado"].forEach(function(t){
     var el = document.getElementById("tela-" + t);
     if(el) el.style.display = (t === nome) ? "block" : "none";
   });
@@ -604,112 +810,49 @@ function renderCardapio(){
 
 function pularCardapio(){
   STATE.cardapioSel = {};
-  STATE.sugRespostas = {};
-  // Vai direto pra lista (vazia, sem pratos)
-  popularListaInicial();
+  STATE.sugSelecionadas = {};
+  // Se está num fluxo de nova lista, popula pelo tipo
+  if(STATE.tipoListaAtiva === "semanal" || STATE.tipoListaAtiva === "mensal"){
+    popularListaParaModo(STATE.tipoListaAtiva);
+    showTela("lista");
+    renderLista();
+  } else {
+    // Sem tipo definido = veio direto da home (atalho legacy)
+    popularListaInicial();
+    showTela("lista");
+    renderLista();
+  }
+}
+
+// Cardápio → "Próximo" vai direto pra Lista (tela Sugestões foi removida)
+function irParaLista_doCardapio(){
+  if(STATE.tipoListaAtiva === "semanal" || STATE.tipoListaAtiva === "mensal"){
+    popularListaParaModo(STATE.tipoListaAtiva);
+  } else {
+    popularListaInicial();
+  }
   showTela("lista");
   renderLista();
 }
 
-function irParaSugestoes(){
-  popularListaInicial();
-  renderSugestoes();
-  showTela("sugestoes");
-}
-
 // ============================================================
-// TELA SUGESTÕES
-// ============================================================
-function calcularSugestoesMensais(){
-  // Pega TODOS os ingredientes de TODOS os pratos selecionados
-  // Filtra só os "mensais" (= não-semanal e não-tempero universal)
-  // Agrupa por ingrediente com lista de pratos
-  var sugs = {};
-  var pratosSel = Object.keys(STATE.cardapioSel);
-  pratosSel.forEach(function(prato){
-    var recs = getReceitaDoPrato(prato);
-    recs.forEach(function(r){
-      var ing = r.Ingrediente;
-      if(!ing) return;
-      if(TEMPEROS_UNIVERSAIS.has(ing)) return;
-      var item = getItemByNome(ing);
-      if(!item) return;
-      // Considera "mensal a conferir" se o ingrediente NÃO é fresco (não perecível típico)
-      // Heurística: setores Hortifruti/Açougue/Setor de Frios/Padaria/Congelados/Laticínios = semanal (entra direto)
-      // Setores Despensa/Temperos/Utilidades/Limpeza/Café = mensal (pergunta)
-      var setor = itemSetor(item);
-      var setoresSemanais = ["Hortifruti","Açougue","Setor de Frios","Padaria","Congelados","Laticínios"];
-      var ehSemanal = setoresSemanais.indexOf(setor) >= 0;
-      if(ehSemanal) return; // já entrou na lista direto
-      if(!sugs[ing]) sugs[ing] = { item: item, pratos: [] };
-      if(sugs[ing].pratos.indexOf(prato) < 0) sugs[ing].pratos.push(prato);
-    });
-  });
-  return Object.keys(sugs).map(function(k){ return sugs[k]; });
-}
-
-function responderSugestao(ing, resposta){
-  STATE.sugRespostas[ing] = resposta;
-  if(resposta === "comprar"){
-    addItemDaSugestao(ing);
-  } else if(resposta === "tenho"){
-    removeItemDaSugestao(ing);
-  }
-  salvarEstado();
-  renderSugestoes();
-}
-
-function addItemDaSugestao(ing){
-  var item = getItemByNome(ing);
-  if(!item) return;
-  var sugs = calcularSugestoesMensais();
-  var match = sugs.find(function(s){ return itemNome(s.item) === ing; });
-  var fromPratos = match ? match.pratos : [];
-  if(!STATE.lista[ing]) STATE.lista[ing] = { qty: 1, checked: true, fromPratos: fromPratos };
-  else { STATE.lista[ing].checked = true; STATE.lista[ing].fromPratos = fromPratos; }
-}
-
-function removeItemDaSugestao(ing){
-  // Só remove se foi adicionado pela sugestão (não tinha sido marcado pelo usuário antes)
-  // Pra simplificar: marca como não-checked
-  if(STATE.lista[ing]) STATE.lista[ing].checked = false;
-}
-
-function renderSugestoes(){
-  var sugs = calcularSugestoesMensais();
-  if(!sugs.length){
-    document.getElementById("sugestoes-content").innerHTML =
-      '<div class="empty">Nada pra conferir 🎉<br><span style="font-size:13px;">Todos os ingredientes dos seus pratos são semanais ou universais.</span></div>';
-    document.getElementById("sugestoes-info").textContent = "";
-    return;
-  }
-  var html = "";
-  sugs.forEach(function(s){
-    var ing = itemNome(s.item);
-    var resp = STATE.sugRespostas[ing];
-    html += '<div class="sug-item">'
-      +'<div class="sug-info">'
-      +'<div class="sug-nome">'+esc(ing)+'</div>'
-      +'<div class="sug-pratos">'+s.pratos.map(function(p){ return '<span class="sug-badge">'+esc(p)+'</span>'; }).join('')+'</div>'
-      +'</div>'
-      +'<div class="sug-btns">'
-      +'<button class="sug-btn sug-tenho'+(resp==='tenho'?' active':'')+'" onclick="responderSugestao(\''+esc(ing).replace(/'/g,"\\'")+'\',\'tenho\')">tenho</button>'
-      +'<button class="sug-btn sug-comprar'+(resp==='comprar'?' active':'')+'" onclick="responderSugestao(\''+esc(ing).replace(/'/g,"\\'")+'\',\'comprar\')">+ comprar</button>'
-      +'</div>'
-      +'</div>';
-  });
-  document.getElementById("sugestoes-content").innerHTML = html;
-  var respondidas = sugs.filter(function(s){ return STATE.sugRespostas[itemNome(s.item)]; }).length;
-  document.getElementById("sugestoes-info").textContent = respondidas + " de " + sugs.length + " respondidas";
-}
-
-// ============================================================
-// POPULAR LISTA INICIAL (com itens semanais dos pratos)
+// POPULAR LISTA INICIAL
+// - Todos os itens da DADOS.itens entram MARCADOS por default (v1 behavior)
+// - Itens semanais dos pratos ganham fromPratos preenchido (badge laranja)
+// - Itens mensais dos pratos só ganham fromPratos depois que usuário marca na sugestão
 // ============================================================
 function popularListaInicial(){
   STATE.lista = {};
   var pratosSel = Object.keys(STATE.cardapioSel);
   var setoresSemanais = ["Hortifruti","Açougue","Setor de Frios","Padaria","Congelados","Laticínios"];
+
+  // 1. Marca TODOS os itens da fonte da verdade como checked: true
+  todosItens().forEach(function(it){
+    var nm = itemNome(it);
+    if(!STATE.lista[nm]) STATE.lista[nm] = { qty: 1, checked: true, fromPratos: [], fromInbox: [] };
+  });
+
+  // 2. Pros itens semanais dos pratos, preenche fromPratos pra ganhar badge
   pratosSel.forEach(function(prato){
     var recs = getReceitaDoPrato(prato);
     recs.forEach(function(r){
@@ -719,17 +862,41 @@ function popularListaInicial(){
       var item = getItemByNome(ing);
       if(!item) return;
       var setor = itemSetor(item);
-      if(setoresSemanais.indexOf(setor) < 0) return; // não é semanal, vai pra sugestão
-      if(!STATE.lista[ing]){
-        STATE.lista[ing] = { qty: 1, checked: true, fromPratos: [prato] };
-      } else {
-        if(STATE.lista[ing].fromPratos.indexOf(prato) < 0){
-          STATE.lista[ing].fromPratos.push(prato);
-        }
-        STATE.lista[ing].checked = true;
+      if(setoresSemanais.indexOf(setor) < 0) return; // mensal — vira sugestão, não entra automaticamente
+      if(!STATE.lista[ing]) STATE.lista[ing] = { qty: 1, checked: true, fromPratos: [], fromInbox: [] };
+      if(!STATE.lista[ing].fromPratos) STATE.lista[ing].fromPratos = [];
+      if(STATE.lista[ing].fromPratos.indexOf(prato) < 0){
+        STATE.lista[ing].fromPratos.push(prato);
       }
+      STATE.lista[ing].checked = true;
     });
   });
+
+  // 3. Integra itens da Inbox — items adicionados durante a semana
+  (STATE.inbox || []).forEach(function(inboxItem){
+    var nome = inboxItem.item;
+    if(!nome) return;
+    var itemExistente = getItemByNome(nome);
+    var nm;
+    if(itemExistente){
+      // Item existe no catálogo — só marca como vindo da inbox
+      nm = itemNome(itemExistente);
+    } else {
+      // Item NÃO existe no catálogo — cria custom (uma vez só)
+      var jaCustom = STATE.itensCustom.find(function(x){ return itemNome(x).toLowerCase() === nome.toLowerCase(); });
+      if(!jaCustom){
+        STATE.itensCustom.push({ "Nome do Item": nome, "Local em Casa": "Outros", "Setor no Mercado": "Outros", "Cortes": "", custom: true });
+      }
+      nm = nome;
+    }
+    if(!STATE.lista[nm]) STATE.lista[nm] = { qty: inboxItem.qty || 1, checked: true, fromPratos: [], fromInbox: [] };
+    if(!STATE.lista[nm].fromInbox) STATE.lista[nm].fromInbox = [];
+    STATE.lista[nm].fromInbox.push({ id: inboxItem.id, autor: inboxItem.adicionado_por });
+    STATE.lista[nm].checked = true;
+    if(inboxItem.qty && inboxItem.qty > 1) STATE.lista[nm].qty = inboxItem.qty;
+    if(inboxItem.corte) STATE.lista[nm].corteEscolhido = inboxItem.corte;
+  });
+
   salvarEstado();
 }
 
@@ -804,7 +971,20 @@ function renderBannerCardapio(){
 
 function renderLista(){
   renderBannerCardapio();
+  // Atualiza título da lista
+  var titulos = { semanal: "Compra Semanal", mensal: "Compra Mensal", livre: "Lista Livre" };
+  var titulo = STATE.nomeListaAtiva || titulos[STATE.tipoListaAtiva] || "Minha Lista";
+  var elTit = document.getElementById("lista-title");
+  if(elTit) elTit.textContent = titulo;
+  // Subtítulo conforme tipo
+  var elSub = document.getElementById("lista-sub");
+  if(elSub){
+    var hint = STATE.tipoListaAtiva === "livre" ? "use a busca pra adicionar" : "toque pra retirar";
+    elSub.innerHTML = '<button class="perfil-link" onclick="trocarPerfil()">👤 <span data-perfil-label>?</span></button> · ' + hint;
+    atualizarIndicadorPerfil();
+  }
   var busca = document.getElementById("busca").value.toLowerCase().trim();
+  var emBusca = busca.length > 0;
   var todos = todosItens().filter(function(it){
     return !busca || itemNome(it).toLowerCase().indexOf(busca) >= 0;
   });
@@ -825,11 +1005,14 @@ function renderLista(){
     mapaLocal[loc].push(it);
   });
   var html = "";
+  var ehLivreVazia = STATE.tipoListaAtiva === "livre" && !noLista.length && !emBusca;
   if(!todos.length){
     html = '<div class="empty">Nenhum item encontrado</div>';
+  } else if(ehLivreVazia){
+    html = '<div class="empty">Lista vazia ⚡<br><span style="font-size:13px;">Use o campo de busca acima pra adicionar itens.</span></div>';
   } else {
     ordemLocais.forEach(function(loc){
-      var coll = !!STATE.colapsadoSel[loc];
+      var coll = !emBusca && !!STATE.colapsadoSel[loc];
       html += '<div class="cat-block">'
         +'<div class="cat-label" data-cat-sel="'+esc(loc)+'">'
         +'<span>'+esc(loc)+'</span>'
@@ -840,14 +1023,26 @@ function renderLista(){
       if(!coll){
         mapaLocal[loc].forEach(function(it){
           var nm = itemNome(it);
-          var e = STATE.lista[nm] || { qty: 1, checked: true, fromPratos: [] };
+          var e = STATE.lista[nm] || { qty: 1, checked: true, fromPratos: [], fromInbox: [] };
           var k = chave(nm);
           var hasPratos = e.fromPratos && e.fromPratos.length > 0;
-          html += '<div class="item'+(hasPratos?' from-prato':'')+'" data-nome="'+esc(nm)+'">'
+          var hasInbox = e.fromInbox && e.fromInbox.length > 0;
+          html += '<div class="item'+(hasPratos||hasInbox?' from-prato':'')+'" data-nome="'+esc(nm)+'">'
             +'<div class="item-name">'
             +'<span>'+esc(nm)+'</span>';
-          if(hasPratos){
-            html += '<span class="item-pratos">'+e.fromPratos.map(function(p){ return '<span class="pp-badge">'+esc(p)+'</span>'; }).join('')+'</span>';
+          if(hasPratos || hasInbox){
+            html += '<span class="item-pratos">';
+            if(hasInbox){
+              var autores = {};
+              e.fromInbox.forEach(function(x){ if(x.autor) autores[x.autor] = true; });
+              Object.keys(autores).forEach(function(a){
+                html += '<span class="item-autor">📥 '+esc(a)+'</span>';
+              });
+            }
+            if(hasPratos){
+              html += e.fromPratos.map(function(p){ return '<span class="pp-badge">'+esc(p)+'</span>'; }).join('');
+            }
+            html += '</span>';
           }
           html += '</div>'
             +(it.custom?'<span class="badge-novo">novo</span>':'')
@@ -860,11 +1055,17 @@ function renderLista(){
       }
       html += '</div>';
     });
-    if(fora.length > 0){
-      var collFora = !!STATE.colapsadoSel["__fora__"];
+    var ehLivre = STATE.tipoListaAtiva === "livre";
+    // Em Lista Livre, "Fora da lista" SÓ aparece quando há busca (vira "Catálogo")
+    var mostrarFora = fora.length > 0 && (!ehLivre || emBusca);
+    if(mostrarFora){
+      var collForaDefault = ehLivre ? false : (STATE.colapsadoSel["__fora__"] === undefined ? false : !!STATE.colapsadoSel["__fora__"]);
+      var collFora = !emBusca && collForaDefault;
+      var labelFora = ehLivre ? "Catálogo (toque pra adicionar)" : "Fora da lista";
+      var labelClasse = ehLivre ? "fora-label catalogo-label" : "fora-label";
       html += '<div class="fora-block">'
-        +'<div class="fora-label" data-cat-sel="__fora__">'
-        +'<span>Fora da lista</span>'
+        +'<div class="'+labelClasse+'" data-cat-sel="__fora__">'
+        +'<span>'+labelFora+'</span>'
         +'<span style="display:flex;align-items:center;gap:4px;">'
         +'<span style="font-weight:400;">'+fora.length+'</span>'
         +'<span class="cat-chevron'+(collFora?' collapsed':'')+'">▼</span>'
@@ -872,8 +1073,26 @@ function renderLista(){
       if(!collFora){
         fora.forEach(function(it){
           var nm = itemNome(it);
-          html += '<div class="item desmarcado" data-nome="'+esc(nm)+'">'
-            +'<div class="item-name"><span>'+esc(nm)+'</span></div>'
+          var e = STATE.lista[nm] || {};
+          var hasPratos = e.fromPratos && e.fromPratos.length > 0;
+          var hasInbox = e.fromInbox && e.fromInbox.length > 0;
+          // Lista Livre: items "fora" são do catálogo (cinza claro), não vermelho
+          var classeFora = ehLivre ? "catalogo" : "desmarcado";
+          html += '<div class="item '+classeFora+'" data-nome="'+esc(nm)+'">'
+            +'<div class="item-name"><span>'+esc(nm)+'</span>';
+          if(hasPratos || hasInbox){
+            html += '<span class="item-pratos">';
+            if(hasInbox){
+              var autores = {};
+              e.fromInbox.forEach(function(x){ if(x.autor) autores[x.autor] = true; });
+              Object.keys(autores).forEach(function(a){ html += '<span class="item-autor">📥 '+esc(a)+'</span>'; });
+            }
+            if(hasPratos){
+              html += e.fromPratos.map(function(p){ return '<span class="pp-badge">'+esc(p)+'</span>'; }).join('');
+            }
+            html += '</span>';
+          }
+          html += '</div>'
             +(it.custom?'<span class="badge-novo">novo</span>':'')
             +'<div class="qty-wrap"></div></div>';
         });
@@ -1120,18 +1339,15 @@ function renderMercado(){
 
 function mkResItem(it){
   var nm = itemNome(it);
-  var e = STATE.lista[nm] || { qty: 1, fromPratos: [] };
+  var e = STATE.lista[nm] || { qty: 1, fromPratos: [], fromInbox: [] };
   var k = chave(nm);
-  var hasPratos = e.fromPratos && e.fromPratos.length > 0;
   var cortes = getCortesDoItem(it);
   var teCortes = cortes.length > 1;
-  var html = '<div class="resultado-item'+(hasPratos?' from-prato':'')+(teCortes?' item-com-cortes':'')+'" data-nome="'+esc(nm)+'" id="ri-'+k+'">';
+  // Mercado sem badges/destaque do cardápio (decisão do usuário)
+  var html = '<div class="resultado-item'+(teCortes?' item-com-cortes':'')+'" data-nome="'+esc(nm)+'" id="ri-'+k+'">';
   html += '<div style="display:flex;align-items:center;width:100%;gap:10px;">'
     +'<span class="ri-qty">'+pad2(e.qty)+'</span>'
     +'<div class="ri-nome"><span>'+esc(nm)+'</span>';
-  if(hasPratos){
-    html += '<span class="ri-pratos">'+e.fromPratos.map(function(p){ return '<span class="pp-badge">'+esc(p)+'</span>'; }).join('')+'</span>';
-  }
   html += '</div>'
     +'<button class="ri-naotm" data-naotm="'+esc(nm)+'" title="Não tem">✕</button>'
     +'</div>';
@@ -1166,8 +1382,7 @@ function mkResItemNaoTem(it){
   return '<div class="resultado-item naotm-item" data-nome="'+esc(nm)+'" id="ri-'+k+'">'
     +'<span class="ri-qty">'+pad2(e.qty)+'</span>'
     +'<span class="ri-nome"><span>'+esc(nm)+'</span></span>'
-    +'<button class="ri-volta" data-volta="'+esc(nm)+'" title="Voltar">↩</button>'
-    +'</div>';
+    +'<button class="ri-volta" data-volta="'+esc(nm)+'" title="Voltar">↩</button></div>';
 }
 
 function mkResItemCatalogo(it){
@@ -1315,30 +1530,962 @@ function copiarZap(){
 }
 
 // ============================================================
-// MODAL (mantido pra compatibilidade futura, não usado por padrão)
+// ATUALIZAR DADOS — força refetch dos CSVs sem esperar TTL
 // ============================================================
+function atualizarDados(){
+  var btn = event && event.target;
+  confirmar({
+    titulo: "Atualizar dados?",
+    texto: "Vai buscar a versão mais recente das planilhas (descarta o cache local).",
+    opcoes: [
+      { label: "Atualizar agora", valor: true, estilo: "primario" },
+      { label: "Cancelar", valor: false }
+    ]
+  }).then(function(ok){
+    if(!ok) return;
+    if(btn) btn.textContent = "...";
+    Promise.all([carregarDados(true), carregarInbox(), carregarListas(), carregarHistorico()]).then(function(){
+      renderHome();
+      renderCardapio();
+      if(btn) btn.textContent = "✓";
+      setTimeout(function(){ if(btn) btn.textContent = "🔄"; }, 1500);
+    }).catch(function(err){
+      alert("Erro ao atualizar: " + (err.message || err));
+      if(btn) btn.textContent = "🔄";
+    });
+  });
+}
+
+// ============================================================
+// COLAR LISTA DO WHATSAPP (fallback de persistência entre dispositivos)
+// ============================================================
+function colarDireto(){
+  if(navigator.clipboard && navigator.clipboard.readText){
+    navigator.clipboard.readText()
+      .then(function(txt){ if(!txt.trim()){ abrirModal(); return; } processarTexto(txt); })
+      .catch(abrirModal);
+  } else { abrirModal(); }
+}
+function abrirModal(){
+  document.getElementById("modal-texto").value = "";
+  document.getElementById("modal").classList.add("open");
+}
 function fecharModal(){ document.getElementById("modal").classList.remove("open"); }
 function fecharModalFora(e){ if(e.target === document.getElementById("modal")) fecharModal(); }
-function importarColado(){ fecharModal(); }
+function importarColado(){
+  var txt = document.getElementById("modal-texto").value;
+  if(!txt.trim()){ alert("Cole o texto primeiro."); return; }
+  fecharModal();
+  processarTexto(txt);
+}
+function processarTexto(txt){
+  // Reseta lista: tudo desmarcado, vai marcar só o que veio no texto
+  Object.keys(STATE.lista).forEach(function(k){ STATE.lista[k].checked = false; });
+  var lines = txt.split("\n");
+  var found = 0, naoReconhecidos = [];
+  lines.forEach(function(line){
+    // Formato: "• 02 - Tomate" ou "- 02 - Tomate" ou "* Tomate"
+    var m = line.match(/^[•\-*]\s*(?:(\d+)\s*-\s*)?(.+)$/);
+    if(!m) return;
+    var qty = m[1] ? parseInt(m[1], 10) : 1;
+    var nome = m[2].trim();
+    // Remove "(corte)" no final se houver
+    var corteMatch = nome.match(/^(.+?)\s*\((.+)\)\s*$/);
+    var corte = null;
+    if(corteMatch){ nome = corteMatch[1].trim(); corte = corteMatch[2].trim(); }
+    var it = todosItens().find(function(x){ return itemNome(x).toLowerCase() === nome.toLowerCase(); });
+    if(it){
+      var nm = itemNome(it);
+      if(!STATE.lista[nm]) STATE.lista[nm] = { qty: qty, checked: true, fromPratos: [] };
+      else { STATE.lista[nm].checked = true; STATE.lista[nm].qty = qty; }
+      if(corte) STATE.lista[nm].corteEscolhido = corte;
+      found++;
+    } else {
+      // Item não está na fonte da verdade — cria custom
+      var novo = { "Nome do Item": nome, "Local em Casa": "Outros", "Setor no Mercado": "Outros", "Cortes": "", custom: true };
+      STATE.itensCustom.push(novo);
+      STATE.lista[nome] = { qty: qty, checked: true, fromPratos: [] };
+      naoReconhecidos.push(nome);
+      found++;
+    }
+  });
+  salvarEstado();
+  if(found){
+    renderLista();
+    showTela("lista");
+    var aviso = found + " itens carregados";
+    if(naoReconhecidos.length) aviso += " (" + naoReconhecidos.length + " novos adicionados ao catálogo)";
+    alert(aviso);
+  } else {
+    alert("Nenhum item reconhecido no texto.\nFormato esperado: • 02 - Tomate");
+  }
+}
+
+// ============================================================
+// PERFIL (Vini / Ce)
+// ============================================================
+function escolherPerfil(perfil){
+  if(!perfil) return;
+  STATE.perfil = perfil.trim();
+  salvarEstado();
+  document.getElementById("perfil-overlay").classList.remove("open");
+  atualizarIndicadorPerfil();
+}
+
+function escolherPerfilDoInput(){
+  var input = document.getElementById("perfil-input");
+  var v = (input.value || "").trim();
+  if(!v){ input.focus(); return; }
+  escolherPerfil(v);
+}
+
+function trocarPerfil(){
+  var input = document.getElementById("perfil-input");
+  input.value = STATE.perfil || "";
+  document.getElementById("perfil-overlay").classList.add("open");
+  setTimeout(function(){ input.focus(); input.select(); }, 50);
+}
+
+function atualizarIndicadorPerfil(){
+  var els = document.querySelectorAll("[data-perfil-label]");
+  els.forEach(function(el){ el.textContent = STATE.perfil || "?"; });
+}
+
+// ============================================================
+// INBOX — itens adicionados ao longo do tempo na planilha
+// ============================================================
+function carregarInbox(){
+  return apiGet("loadInbox").then(function(data){
+    STATE.inbox = (data && data.inbox) || [];
+    salvarEstado();
+  }).catch(function(err){
+    console.warn("Erro ao carregar Inbox:", err.message);
+    // Mantém o que tem em cache local
+  });
+}
+
+function adicionarItemAInbox(nomeItem, opcoes){
+  opcoes = opcoes || {};
+  var item = {
+    item: nomeItem,
+    qty: opcoes.qty || 1,
+    corte: opcoes.corte || "",
+    adicionado_por: STATE.perfil || "?",
+    tags: opcoes.tags || [],
+    observacao: opcoes.observacao || ""
+  };
+  // Otimista: adiciona localmente primeiro
+  var tempId = "temp_" + Date.now();
+  var inboxItem = Object.assign({ id: tempId, timestamp: new Date().toISOString() }, item);
+  STATE.inbox.push(inboxItem);
+  salvarEstado();
+  // Sincroniza com a planilha
+  return apiPost("addInboxItem", { item: item }).then(function(resp){
+    // Substitui temp_id pelo id real
+    var entry = STATE.inbox.find(function(x){ return x.id === tempId; });
+    if(entry && resp.id){ entry.id = resp.id; entry.timestamp = resp.timestamp; }
+    salvarEstado();
+    return resp;
+  }).catch(function(err){
+    console.warn("Erro ao salvar Inbox na planilha:", err.message);
+    alert("Item salvo localmente, mas não sincronizou: " + err.message);
+  });
+}
+
+function removerItensDaInbox(ids){
+  if(!ids || !ids.length) return Promise.resolve();
+  // Local
+  STATE.inbox = STATE.inbox.filter(function(it){ return ids.indexOf(it.id) < 0; });
+  salvarEstado();
+  // Remoto
+  return apiPost("removeInboxItems", { ids: ids }).catch(function(err){
+    console.warn("Erro ao remover da Inbox:", err.message);
+  });
+}
+
+// ============================================================
+// LOADING OVERLAY (mostrar enquanto promessas pendentes)
+// ============================================================
+function mostrarLoading(msg){
+  document.getElementById("load-msg").textContent = msg || "Aguarde…";
+  document.getElementById("load-overlay").classList.add("open");
+}
+function esconderLoading(){
+  document.getElementById("load-overlay").classList.remove("open");
+}
+function comLoading(msg, promise){
+  mostrarLoading(msg);
+  return promise.finally(esconderLoading);
+}
+
+// ============================================================
+// MODAL DE INPUT (nome + checkbox opcional)
+// pedir({titulo, texto, placeholder, valorPadrao, checkboxLabel, checkboxValor})
+// retorna Promise<{texto, checked} | null se cancelou>
+// ============================================================
+var _inputResolve = null;
+function pedir(opts){
+  return new Promise(function(resolve){
+    _inputResolve = resolve;
+    document.getElementById("input-titulo").textContent = opts.titulo || "";
+    document.getElementById("input-texto").textContent = opts.texto || "";
+    var campo = document.getElementById("input-campo");
+    campo.value = opts.valorPadrao || "";
+    campo.placeholder = opts.placeholder || "";
+    var checkWrap = document.getElementById("input-check-wrap");
+    if(opts.checkboxLabel){
+      checkWrap.style.display = "flex";
+      document.getElementById("input-check-label").textContent = opts.checkboxLabel;
+      document.getElementById("input-check").checked = !!opts.checkboxValor;
+    } else {
+      checkWrap.style.display = "none";
+    }
+    document.getElementById("input-overlay").classList.add("open");
+    setTimeout(function(){ campo.focus(); }, 50);
+  });
+}
+function _inputConfirma(ok){
+  document.getElementById("input-overlay").classList.remove("open");
+  if(!_inputResolve) return;
+  if(ok){
+    _inputResolve({
+      texto: document.getElementById("input-campo").value.trim(),
+      checked: document.getElementById("input-check").checked
+    });
+  } else {
+    _inputResolve(null);
+  }
+  _inputResolve = null;
+}
+
+// ============================================================
+// MODAL DE CONFIRMAÇÃO (botões customizados)
+// confirmar({titulo, texto, opcoes: [{label, valor, estilo}]})
+// retorna Promise<valor>
+// ============================================================
+function confirmar(opts){
+  return new Promise(function(resolve){
+    document.getElementById("confirma-titulo").textContent = opts.titulo || "Confirmar";
+    document.getElementById("confirma-texto").textContent = opts.texto || "";
+    var cont = document.getElementById("confirma-btns");
+    cont.innerHTML = "";
+    (opts.opcoes || []).forEach(function(o){
+      var btn = document.createElement("button");
+      btn.className = "perfil-opt";
+      btn.textContent = o.label;
+      if(o.estilo === "perigo") btn.style.borderColor = "var(--red-border)", btn.style.color = "var(--red)";
+      else if(o.estilo === "primario") btn.style.borderColor = "var(--accent)", btn.style.background = "var(--accent)", btn.style.color = "var(--accent-fg)";
+      btn.onclick = function(){
+        document.getElementById("confirma-overlay").classList.remove("open");
+        resolve(o.valor);
+      };
+      cont.appendChild(btn);
+    });
+    document.getElementById("confirma-overlay").classList.add("open");
+  });
+}
+
+// ============================================================
+// LISTAS SALVAS (backend)
+// ============================================================
+function carregarListas(){
+  return apiGet("loadListas").then(function(data){
+    STATE.listas = (data && data.listas) || [];
+    salvarEstado();
+  }).catch(function(err){ console.warn("Erro listas:", err.message); });
+}
+
+function carregarHistorico(){
+  return apiGet("loadHistorico").then(function(data){
+    STATE.historico = (data && data.historico) || [];
+    salvarEstado();
+  }).catch(function(err){ console.warn("Erro histórico:", err.message); });
+}
+
+function _estadoListaAtual(){
+  return {
+    cardapioSel: STATE.cardapioSel,
+    sugSelecionadas: STATE.sugSelecionadas,
+    lista: STATE.lista,
+    mercado: STATE.mercado,
+    incluiInbox: STATE.incluiInbox,
+    itensCustom: STATE.itensCustom
+  };
+}
+
+function _carregarEstadoLista(estado){
+  STATE.cardapioSel = estado.cardapioSel || {};
+  STATE.sugSelecionadas = estado.sugSelecionadas || {};
+  STATE.lista = estado.lista || {};
+  STATE.mercado = estado.mercado || {};
+  STATE.incluiInbox = estado.incluiInbox !== false;
+  STATE.itensCustom = estado.itensCustom || [];
+}
+
+function _limparEstadoLista(){
+  STATE.cardapioSel = {};
+  STATE.sugSelecionadas = {};
+  STATE.lista = {};
+  STATE.mercado = {};
+  STATE.itensCustom = [];
+}
+
+function salvarListaAtiva(){
+  if(!STATE.listaAtivaId && !STATE.tipoListaAtiva) return Promise.resolve();
+  var lista = {
+    id: STATE.listaAtivaId,
+    nome: STATE.nomeListaAtiva || (STATE.tipoListaAtiva + " — " + new Date().toLocaleDateString("pt-BR")),
+    tipo: STATE.tipoListaAtiva,
+    autor: STATE.perfil || "?",
+    estado: _estadoListaAtual()
+  };
+  return apiPost("saveLista", { lista: lista }).then(function(resp){
+    if(resp.id){
+      STATE.listaAtivaId = resp.id;
+      // Atualiza cache local
+      var idx = STATE.listas.findIndex(function(l){ return l.id === resp.id; });
+      if(idx >= 0){
+        STATE.listas[idx].estado = lista.estado;
+        STATE.listas[idx].nome = lista.nome;
+        STATE.listas[idx].atualizada_em = new Date().toISOString();
+      } else {
+        STATE.listas.push({
+          id: resp.id, nome: lista.nome, tipo: lista.tipo, autor: lista.autor,
+          estado: lista.estado, criada_em: new Date().toISOString(), atualizada_em: new Date().toISOString()
+        });
+      }
+      salvarEstado();
+    }
+    return resp;
+  });
+}
+
+function deletarListaSalva(id){
+  return apiPost("deleteLista", { id: id }).then(function(){
+    STATE.listas = STATE.listas.filter(function(l){ return l.id !== id; });
+    salvarEstado();
+  });
+}
+
+// ============================================================
+// FLUXO: criar/abrir/descartar/finalizar listas
+// ============================================================
+function novaLista(tipo){
+  if(STATE.listas.length >= 5){
+    alert("Limite de 5 listas salvas atingido. Apague ou finalize alguma primeiro.");
+    return;
+  }
+  if(!STATE.perfil){ trocarPerfil(); return; }
+  STATE.listaAtivaId = null;
+  STATE.tipoListaAtiva = tipo;
+  STATE.nomeListaAtiva = "";
+  _limparEstadoLista();
+  if(tipo === "livre"){
+    pedir({
+      titulo: "Nova Lista Livre",
+      texto: "Dê um nome (opcional) e escolha se quer começar com os Lembrados.",
+      placeholder: "ex: Churrasco, Jantar de sexta…",
+      checkboxLabel: "Incluir itens dos Lembrados",
+      checkboxValor: false
+    }).then(function(r){
+      if(!r) return;  // cancelado
+      STATE.nomeListaAtiva = r.texto || "";
+      STATE.incluiInbox = r.checked;
+      popularListaParaModo("livre");
+      irParaLista();
+    });
+  } else {
+    STATE.incluiInbox = true;
+    showTela("cardapio");
+    renderCardapio();
+  }
+}
+
+function abrirLista(id, modoMercadoDireto){
+  var lista = STATE.listas.find(function(l){ return l.id === id; });
+  if(!lista){ alert("Lista não encontrada."); return; }
+  STATE.listaAtivaId = lista.id;
+  STATE.tipoListaAtiva = lista.tipo;
+  STATE.nomeListaAtiva = lista.nome;
+  _carregarEstadoLista(lista.estado || {});
+  if(modoMercadoDireto){
+    irParaMercado();
+  } else {
+    irParaLista();
+  }
+}
+
+function descartarListaAtiva(){
+  confirmar({
+    titulo: "Descartar lista?",
+    texto: "Vai apagar todas as alterações desta lista.\nEssa ação não pode ser desfeita.",
+    opcoes: [
+      { label: "Manter lista", valor: false },
+      { label: "Descartar mesmo assim", valor: true, estilo: "perigo" }
+    ]
+  }).then(function(ok){
+    if(!ok) return;
+    if(STATE.listaAtivaId) deletarListaSalva(STATE.listaAtivaId);
+    STATE.listaAtivaId = null;
+    STATE.tipoListaAtiva = null;
+    STATE.nomeListaAtiva = "";
+    _limparEstadoLista();
+    _sairParaHome();
+  });
+}
+
+function voltarParaHome(){
+  if(STATE.listaAtivaId !== null || STATE.tipoListaAtiva){
+    var ehNova = STATE.tipoListaAtiva && !STATE.listaAtivaId;
+    confirmar({
+      titulo: ehNova ? "Salvar nova lista?" : "Salvar alterações?",
+      texto: ehNova ? "Você criou uma nova lista mas ainda não salvou." : "Você fez mudanças nesta lista.",
+      opcoes: [
+        { label: "Salvar e voltar", valor: "salvar", estilo: "primario" },
+        { label: "Descartar mudanças", valor: "descartar", estilo: "perigo" }
+      ]
+    }).then(function(escolha){
+      if(escolha === "salvar"){
+        salvarListaAtiva().then(_sairParaHome);
+      } else if(escolha === "descartar"){
+        _sairParaHome();
+      }
+    });
+    return;
+  }
+  _sairParaHome();
+}
+
+function _sairParaHome(){
+  STATE.listaAtivaId = null;
+  STATE.tipoListaAtiva = null;
+  STATE.nomeListaAtiva = "";
+  _limparEstadoLista();
+  showTela("home");
+  renderHome();
+}
+
+// ============================================================
+// HOME — render
+// ============================================================
+function renderHome(){
+  // Inbox — só contagem, sem preview (decisão do usuário)
+  var nInbox = STATE.inbox.length;
+  document.getElementById("home-inbox-count").textContent = "";
+  var resumoEl = document.getElementById("home-inbox-resumo");
+  if(nInbox === 0){
+    resumoEl.innerHTML = '<span class="home-inbox-empty">Nada por enquanto. Toque para adicionar.</span>';
+  } else {
+    resumoEl.innerHTML = '<b>' + nInbox + '</b> item' + (nInbox===1?'':'s') + ' · toque para ver';
+  }
+
+  // Listas salvas
+  var listasHtml = "";
+  if(!STATE.listas.length){
+    listasHtml = '<div style="font-size:13px;color:var(--text3);font-style:italic;padding:4px 4px;">Sem listas salvas.</div>';
+  } else {
+    STATE.listas.forEach(function(lista){
+      var qtdItens = lista.estado && lista.estado.lista ? Object.keys(lista.estado.lista).filter(function(k){ return lista.estado.lista[k].checked; }).length : 0;
+      var dataAtt = lista.atualizada_em ? new Date(lista.atualizada_em).toLocaleDateString("pt-BR") : "";
+      var safeId = esc(lista.id);
+      listasHtml += '<div class="lista-card">'
+        +'<div class="lc-top">'
+        +'<span class="lc-tipo '+esc(lista.tipo)+'">'+esc(lista.tipo)+'</span>'
+        +'<span class="lc-nome">'+esc(lista.nome || lista.tipo)+'</span>'
+        +'</div>'
+        +'<div class="lc-meta">'+qtdItens+' itens · '+esc(lista.autor)+' · '+dataAtt+'</div>'
+        +'<div class="lc-btns">'
+        +'<button class="lc-btn" onclick="abrirLista(\''+safeId+'\')">✏️ editar</button>'
+        +'<button class="lc-btn lc-mercado" onclick="abrirLista(\''+safeId+'\', true)">🛒 mercado</button>'
+        +'<button class="lc-btn lc-del" onclick="confirmarDeleteLista(\''+safeId+'\')" title="Apagar">✕</button>'
+        +'</div></div>';
+    });
+  }
+  document.getElementById("home-listas-content").innerHTML = listasHtml;
+  document.getElementById("home-listas-count").textContent = STATE.listas.length ? "(" + STATE.listas.length + "/5)" : "";
+
+  // Histórico
+  var histHtml = "";
+  if(!STATE.historico.length){
+    histHtml = '<div style="font-size:13px;color:var(--text3);font-style:italic;padding:9px 12px;">Nenhuma compra finalizada ainda.</div>';
+  } else {
+    STATE.historico.slice(-3).reverse().forEach(function(h){
+      var data = h.timestamp_fim ? new Date(h.timestamp_fim).toLocaleDateString("pt-BR") : "";
+      histHtml += '<div class="hist-item">'
+        +'<span class="hi-tipo">'+esc(h.tipo)+'</span>'
+        +'<span class="hi-nome">'+esc(h.nome || h.tipo)+' · '+(h.qtd_comprados||0)+' itens</span>'
+        +'<span class="hi-data">'+data+'</span>'
+        +'</div>';
+    });
+    var ultima = STATE.historico[STATE.historico.length-1];
+    if(ultima && ultima.timestamp_fim){
+      var dias = Math.floor((Date.now() - new Date(ultima.timestamp_fim).getTime()) / (1000*60*60*24));
+      var txt = dias === 0 ? "hoje" : (dias === 1 ? "ontem" : "há " + dias + " dias");
+      document.getElementById("home-ultima").textContent = "Última compra: " + txt;
+    }
+  }
+  document.getElementById("home-historico-content").innerHTML = histHtml;
+  atualizarIndicadorPerfil();
+}
+
+function confirmarDeleteLista(id){
+  var lista = STATE.listas.find(function(l){ return l.id === id; });
+  confirmar({
+    titulo: "Apagar lista?",
+    texto: lista ? ('"' + lista.nome + '"\nEssa ação não pode ser desfeita.') : "Essa ação não pode ser desfeita.",
+    opcoes: [
+      { label: "Manter", valor: false },
+      { label: "Apagar", valor: true, estilo: "perigo" }
+    ]
+  }).then(function(ok){
+    if(ok) deletarListaSalva(id).then(renderHome);
+  });
+}
+
+function irParaInbox(){
+  renderInboxScreen();
+  showTela("inbox");
+}
+
+function renderInboxScreen(){
+  var busca = (document.getElementById("busca-inbox").value || "").toLowerCase().trim();
+  var emBusca = busca.length > 0;
+  var itensInbox = STATE.inbox.filter(function(it){
+    return !busca || (it.item || "").toLowerCase().indexOf(busca) >= 0;
+  });
+  var nomesInbox = STATE.inbox.map(function(it){ return (it.item||"").toLowerCase(); });
+  var catalogoMatch = emBusca ? todosItens().filter(function(it){
+    var nm = itemNome(it);
+    return nm.toLowerCase().indexOf(busca) >= 0 && nomesInbox.indexOf(nm.toLowerCase()) < 0;
+  }) : [];
+
+  var html = "";
+  if(!STATE.inbox.length && !emBusca){
+    html = '<div class="empty">Vazio 📭<br><span style="font-size:13px;">Adicione itens pra próxima compra.</span></div>';
+  } else {
+    if(STATE.inbox.length){
+      html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:0 4px 8px;font-size:12px;color:var(--text3);">'
+        +'<span>'+STATE.inbox.length+' item'+(STATE.inbox.length===1?'':'s')+'</span>'
+        +'<button onclick="limparTodosLembrados()" style="font-size:11px;padding:5px 10px;border:1px solid var(--red-border);color:var(--red);background:transparent;border-radius:4px;cursor:pointer;font-family:\'DM Sans\',sans-serif;">✕ limpar todos</button>'
+        +'</div>';
+    }
+    if(emBusca && !itensInbox.length && !catalogoMatch.length){
+      html += '<div class="empty" style="padding:24px 20px;">Nenhum resultado pra "'+esc(busca)+'"</div>';
+    }
+    // Itens na Inbox (qty + remover)
+    itensInbox.forEach(function(it){
+      var safeId = esc(it.id);
+      var k = chave(it.id);
+      var quando = it.timestamp ? new Date(it.timestamp).toLocaleDateString("pt-BR") : "";
+      html += '<div class="item" data-nome="'+esc(it.item)+'">'
+        +'<div class="item-name"><span>'+esc(it.item)+'</span>'
+        +'<span class="item-pratos"><span class="item-autor">📥 '+esc(it.adicionado_por||"?")+'</span> · '+quando+'</span>'
+        +'</div>'
+        +'<div class="qty-wrap">'
+        +'<button class="qty-btn" onclick="alterarQtyInbox(\''+safeId+'\',-1)">−</button>'
+        +'<span class="qty-num" id="qn-inbox-'+k+'">'+(it.qty||1)+'</span>'
+        +'<button class="qty-btn" onclick="alterarQtyInbox(\''+safeId+'\',1)">+</button>'
+        +'</div>'
+        +'<button class="ri-naotm" style="margin-left:8px;" onclick="confirmarRemoverInbox(\''+safeId+'\',\''+esc(it.item).replace(/\'/g,"\\\\'")+'\')" title="Remover">✕</button>'
+        +'</div>';
+    });
+    // Itens do catálogo: clique no item adiciona (sem botão +)
+    if(catalogoMatch.length){
+      html += '<div style="font-size:11px;color:var(--text3);font-family:\'DM Mono\',monospace;margin:14px 4px 6px;text-transform:uppercase;letter-spacing:.08em;">📋 toque pra adicionar</div>';
+      catalogoMatch.forEach(function(it){
+        var nm = itemNome(it);
+        var safeNm = esc(nm).replace(/\'/g,"\\\\'");
+        html += '<div class="item" onclick="addAoLembradosDoCatalogo(\''+safeNm+'\')" style="background:var(--surface2);cursor:pointer;">'
+          +'<div class="item-name"><span>'+esc(nm)+'</span>'
+          +'<span class="item-pratos" style="color:var(--text3);">'+esc(itemSetor(it))+'</span>'
+          +'</div></div>';
+      });
+    }
+  }
+  document.getElementById("inbox-content").innerHTML = html;
+}
+
+function alterarQtyInbox(id, delta){
+  var item = STATE.inbox.find(function(x){ return x.id === id; });
+  if(!item) return;
+  item.qty = Math.max(1, (item.qty || 1) + delta);
+  // Atualiza só o número (sem re-render completo)
+  var el = document.getElementById("qn-inbox-" + chave(id));
+  if(el) el.textContent = item.qty;
+  salvarEstado();
+  // Persiste no backend (debounced via clearTimeout reutilizando timer)
+  if(window._inboxQtyTimer) clearTimeout(window._inboxQtyTimer);
+  window._inboxQtyTimer = setTimeout(function(){
+    apiPost("updateInboxItem", { id: id, changes: { qty: item.qty } }).catch(function(err){
+      console.warn("Erro ao atualizar qty:", err.message);
+    });
+  }, 800);
+}
+
+function limparTodosLembrados(){
+  confirmar({
+    titulo: "Limpar todos?",
+    texto: "Vai remover todos os " + STATE.inbox.length + " itens dos Lembrados. Sem reversão.",
+    opcoes: [
+      { label: "Manter", valor: false },
+      { label: "Limpar todos", valor: true, estilo: "perigo" }
+    ]
+  }).then(function(ok){
+    if(!ok) return;
+    var ids = STATE.inbox.map(function(it){ return it.id; });
+    comLoading("Limpando " + ids.length + " itens…", removerItensDaInbox(ids)).then(renderInboxScreen);
+  });
+}
+
+function addAoLembradosDoCatalogo(nome){
+  comLoading("Adicionando…", adicionarItemAInbox(nome)).then(function(){
+    document.getElementById("busca-inbox").value = "";
+    document.getElementById("btn-add-inbox").classList.remove("visible");
+    renderInboxScreen();
+  });
+}
+
+function confirmarRemoverInbox(id, nome){
+  confirmar({
+    titulo: "Remover dos Lembrados?",
+    texto: "\"" + nome + "\"",
+    opcoes: [
+      { label: "Manter", valor: false },
+      { label: "Remover", valor: true, estilo: "perigo" }
+    ]
+  }).then(function(ok){
+    if(ok) removerItensDaInbox([id]).then(renderInboxScreen);
+  });
+}
+
+function onBuscaInbox(){
+  var v = document.getElementById("busca-inbox").value.trim();
+  var existeInbox = STATE.inbox.some(function(it){ return (it.item||"").toLowerCase() === v.toLowerCase(); });
+  var existeCatalogo = todosItens().some(function(it){ return itemNome(it).toLowerCase() === v.toLowerCase(); });
+  // Só mostra "+ Adicionar" se NÃO existe em lugar nenhum (Inbox nem Catálogo)
+  document.getElementById("btn-add-inbox").classList.toggle("visible", v.length > 1 && !existeInbox && !existeCatalogo);
+  renderInboxScreen();
+}
+
+function addItemInbox(){
+  var v = document.getElementById("busca-inbox").value.trim();
+  if(!v) return;
+  if(!STATE.perfil){ trocarPerfil(); return; }
+  adicionarItemAInbox(v).then(function(){
+    document.getElementById("busca-inbox").value = "";
+    document.getElementById("btn-add-inbox").classList.remove("visible");
+    renderInboxScreen();
+  });
+}
+
+// Popula lista pra um modo específico (semanal/mensal/livre)
+function popularListaParaModo(tipo){
+  STATE.lista = {};
+  var pratosSel = Object.keys(STATE.cardapioSel);
+  var setoresSemanais = ["Hortifruti","Açougue","Setor de Frios","Padaria","Congelados","Laticínios"];
+
+  // 1. Itens da fonte da verdade conforme tipo
+  todosItens().forEach(function(it){
+    var nm = itemNome(it);
+    var tags = getTagsItem(it);
+    var entra = false;
+    if(tipo === "semanal" && tags.indexOf("semanal") >= 0) entra = true;
+    else if(tipo === "mensal" && tags.indexOf("mensal") >= 0) entra = true;
+    else if(tipo === "livre") entra = false;  // livre começa vazia
+    if(entra && !STATE.lista[nm]) STATE.lista[nm] = { qty: 1, checked: true, fromPratos: [], fromInbox: [] };
+  });
+
+  // 2. Itens semanais dos pratos (cardápio) ganham badge
+  pratosSel.forEach(function(prato){
+    getReceitaDoPrato(prato).forEach(function(r){
+      var ing = r.Ingrediente;
+      if(!ing || TEMPEROS_UNIVERSAIS.has(ing)) return;
+      var item = getItemByNome(ing);
+      if(!item) return;
+      var setor = itemSetor(item);
+      if(setoresSemanais.indexOf(setor) < 0) return;
+      if(!STATE.lista[ing]) STATE.lista[ing] = { qty: 1, checked: true, fromPratos: [], fromInbox: [] };
+      if(!STATE.lista[ing].fromPratos) STATE.lista[ing].fromPratos = [];
+      if(STATE.lista[ing].fromPratos.indexOf(prato) < 0) STATE.lista[ing].fromPratos.push(prato);
+      STATE.lista[ing].checked = true;
+    });
+  });
+
+  // 3. Inbox (se incluído)
+  if(STATE.incluiInbox){
+    (STATE.inbox || []).forEach(function(inboxItem){
+      var nome = inboxItem.item;
+      if(!nome) return;
+      var itemExistente = getItemByNome(nome);
+      var nm;
+      if(itemExistente){ nm = itemNome(itemExistente); }
+      else {
+        var jaCustom = STATE.itensCustom.find(function(x){ return itemNome(x).toLowerCase() === nome.toLowerCase(); });
+        if(!jaCustom) STATE.itensCustom.push({ "Nome do Item": nome, "Local em Casa": "Outros", "Setor no Mercado": "Outros", "Cortes": "", "tags": "mensal,semanal", custom: true });
+        nm = nome;
+      }
+      if(!STATE.lista[nm]) STATE.lista[nm] = { qty: inboxItem.qty || 1, checked: true, fromPratos: [], fromInbox: [] };
+      if(!STATE.lista[nm].fromInbox) STATE.lista[nm].fromInbox = [];
+      STATE.lista[nm].fromInbox.push({ id: inboxItem.id, autor: inboxItem.adicionado_por });
+      STATE.lista[nm].checked = true;
+    });
+  }
+  salvarEstado();
+}
+
+function getTagsItem(it){
+  var t = it.tags || it["tags"] || "";
+  if(!t) return [];
+  return String(t).split(",").map(function(x){ return x.trim(); }).filter(Boolean);
+}
+
+function adicionarAInbox(){
+  if(!STATE.perfil){
+    document.getElementById("perfil-overlay").classList.add("open");
+    return;
+  }
+  var nome = prompt("Adicionar aos Lembrados (compartilhado):\n\nQual item?");
+  if(!nome || !nome.trim()) return;
+  nome = nome.trim();
+  adicionarItemAInbox(nome).then(function(){
+    // Re-popula a lista pra mostrar o novo item com badge
+    popularListaInicial();
+    if(document.getElementById("tela-lista").style.display !== "none"){
+      renderLista();
+    }
+  });
+}
+
+// ============================================================
+// FINALIZAR / PRÓXIMO MERCADO
+// ============================================================
+function _coletarIdsInboxComprados(){
+  // Pega ids da Inbox cujos itens foram marcados como "feito" no mercado
+  var ids = [];
+  STATE.inbox.forEach(function(inboxItem){
+    var nm = inboxItem.item;
+    var item = getItemByNome(nm);
+    var nomeReal = item ? itemNome(item) : nm;
+    var m = STATE.mercado[nomeReal];
+    if(m && m.feito) ids.push(inboxItem.id);
+  });
+  return ids;
+}
+
+function _coletarIdsInboxNaoEncontrados(){
+  var ids = [];
+  STATE.inbox.forEach(function(inboxItem){
+    var nm = inboxItem.item;
+    var item = getItemByNome(nm);
+    var nomeReal = item ? itemNome(item) : nm;
+    var m = STATE.mercado[nomeReal];
+    if(m && m.naoTem) ids.push(inboxItem.id);
+  });
+  return ids;
+}
+
+function salvarESair(){
+  salvarListaAtiva().then(function(){
+    _sairParaHome();
+  }).catch(function(err){
+    alert("Erro ao salvar: " + (err.message || err));
+  });
+}
+
+function proximoMercado(){
+  var listaAtiva = todosItens().filter(function(it){
+    var nm = itemNome(it);
+    return STATE.lista[nm] && STATE.lista[nm].checked;
+  });
+  var feitos = listaAtiva.filter(function(it){ var m = STATE.mercado[itemNome(it)]; return m && m.feito; });
+  var naoEnc = listaAtiva.filter(function(it){ var m = STATE.mercado[itemNome(it)]; return m && m.naoTem; });
+  if(!feitos.length && !naoEnc.length){ alert("Nenhum item marcado ainda."); return; }
+  confirmar({
+    titulo: "Ir pra outro mercado?",
+    texto: feitos.length + " no carrinho saem da lista\n" + naoEnc.length + " não encontrados voltam pra pendente\n\nLista fica salva pra continuar depois.",
+    opcoes: [
+      { label: "Sim, salvar e ir", valor: true, estilo: "primario" },
+      { label: "Continuar aqui", valor: false }
+    ]
+  }).then(function(ok){
+    if(!ok) return;
+    var idsComprados = _coletarIdsInboxComprados();
+    removerItensDaInbox(idsComprados);
+    feitos.forEach(function(it){
+      var nm = itemNome(it);
+      if(STATE.lista[nm]) STATE.lista[nm].checked = false;
+      if(STATE.mercado[nm]) { STATE.mercado[nm].feito = false; STATE.mercado[nm].naoTem = false; }
+    });
+    naoEnc.forEach(function(it){
+      var nm = itemNome(it);
+      if(STATE.mercado[nm]) STATE.mercado[nm].naoTem = false;
+    });
+    salvarListaAtiva().finally(function(){
+      // Volta pra Lista pra continuar editando antes de ir pro próximo mercado
+      showTela("lista");
+      renderLista();
+    });
+  });
+}
+
+function finalizarCompra(){
+  var listaAtiva = todosItens().filter(function(it){
+    var nm = itemNome(it);
+    return STATE.lista[nm] && STATE.lista[nm].checked;
+  });
+  var feitos = listaAtiva.filter(function(it){ var m = STATE.mercado[itemNome(it)]; return m && m.feito; });
+  var naoEnc = listaAtiva.filter(function(it){ var m = STATE.mercado[itemNome(it)]; return m && m.naoTem; });
+  var pendentes = listaAtiva.filter(function(it){ var m = STATE.mercado[itemNome(it)]; return !m || (!m.feito && !m.naoTem); });
+  var pra_inbox = pendentes.concat(naoEnc);
+
+  var texto = feitos.length + " no carrinho (saem da lista)\n"
+    + naoEnc.length + " não encontrados (voltam pra Lembrados)\n"
+    + pendentes.length + " pendentes (voltam pra Lembrados)";
+  confirmar({
+    titulo: "Finalizar compra?",
+    texto: texto,
+    opcoes: [
+      { label: "Finalizar e fechar", valor: true, estilo: "primario" },
+      { label: "Continuar comprando", valor: false }
+    ]
+  }).then(function(ok){
+    if(!ok) return;
+    _executarFinalizacao(feitos, naoEnc, pendentes, pra_inbox);
+  });
+}
+
+function _executarFinalizacao(feitos, naoEnc, pendentes, pra_inbox){
+
+  var idsComprados = _coletarIdsInboxComprados();
+  var itensPraInbox = pra_inbox.map(function(it){
+    var nm = itemNome(it);
+    var e = STATE.lista[nm] || {};
+    return {
+      item: nm,
+      qty: e.qty || 1,
+      corte: e.corteEscolhido || "",
+      adicionado_por: STATE.perfil || "?",
+      tags: getTagsItem(it).join(","),
+      veio_de_lista: STATE.nomeListaAtiva || STATE.tipoListaAtiva || ""
+    };
+  });
+
+  apiPost("finalizarLista", {
+    id: STATE.listaAtivaId,
+    dados: {
+      autor: STATE.perfil || "?",
+      tipo: STATE.tipoListaAtiva || "rapida",
+      nome: STATE.nomeListaAtiva || "",
+      duracao_min: 0,
+      qtd_comprados: feitos.length,
+      qtd_devolvidos_inbox: pendentes.length,
+      qtd_nao_encontrados: naoEnc.length,
+      cardapio: Object.keys(STATE.cardapioSel),
+      ids_comprados: idsComprados,
+      itens_pra_inbox: itensPraInbox,
+      resumo: {
+        comprados: feitos.map(function(it){ return itemNome(it); }),
+        nao_encontrados: naoEnc.map(function(it){ return itemNome(it); }),
+        pendentes: pendentes.map(function(it){ return itemNome(it); })
+      }
+    }
+  }).then(function(){
+    // recarrega caches
+    return Promise.all([carregarInbox(), carregarListas(), carregarHistorico()]);
+  }).catch(function(err){
+    console.warn("Erro ao finalizar:", err.message);
+  });
+
+  // Reset local imediato (otimista)
+  STATE.inbox = STATE.inbox.filter(function(it){ return idsComprados.indexOf(it.id) < 0; });
+  if(STATE.listaAtivaId){
+    STATE.listas = STATE.listas.filter(function(l){ return l.id !== STATE.listaAtivaId; });
+  }
+  STATE.listaAtivaId = null;
+  STATE.tipoListaAtiva = null;
+  STATE.nomeListaAtiva = "";
+  _limparEstadoLista();
+  salvarEstado();
+  showTela("home");
+  renderHome();
+  setTimeout(function(){
+    confirmar({
+      titulo: "Compra finalizada! 🎉",
+      texto: feitos.length + " comprado" + (feitos.length===1?"":"s") + "." + (pra_inbox.length ? "\n" + pra_inbox.length + " item" + (pra_inbox.length===1?"":"s") + " volt" + (pra_inbox.length===1?"ou":"aram") + " pra " + nomeInbox() + "." : ""),
+      opcoes: [{ label: "Ok", valor: true, estilo: "primario" }]
+    });
+  }, 100);
+}
+
+function nomeInbox(){ return "Lembrados"; }
+
+// ============================================================
+// RETOMAR SESSÃO ANTERIOR
+// ============================================================
+function temSessaoAnterior(){
+  if(!STATE.cardapioSel) return false;
+  return Object.keys(STATE.cardapioSel).length > 0
+      || Object.keys(STATE.lista).length > 0
+      || Object.keys(STATE.mercado).filter(function(k){ return STATE.mercado[k].feito || STATE.mercado[k].naoTem; }).length > 0;
+}
+
+function perguntarRetomar(){
+  // Calcula resumo
+  var pratos = Object.keys(STATE.cardapioSel).length;
+  var marcados = Object.keys(STATE.lista).filter(function(k){ return STATE.lista[k].checked; }).length;
+  var noCarrinho = Object.keys(STATE.mercado).filter(function(k){ return STATE.mercado[k].feito; }).length;
+  var desc = [];
+  if(pratos) desc.push(pratos + " prato" + (pratos===1?"":"s") + " no cardápio");
+  if(marcados) desc.push(marcados + " item" + (marcados===1?"":"s") + " na lista");
+  if(noCarrinho) desc.push(noCarrinho + " no carrinho");
+  var msg = "Você tem uma lista em andamento:\n• " + desc.join("\n• ") + "\n\nRetomar de onde parou?";
+  return confirm(msg);
+}
 
 // ============================================================
 // INIT
 // ============================================================
 function init(){
   carregarEstado();
+  if(!STATE.perfil) document.getElementById("perfil-overlay").classList.add("open");
+  atualizarIndicadorPerfil();
+  // Mostra Home logo (mesmo antes de carregar dados)
+  showTela("home");
+  renderHome();
   carregarDados(false).then(function(){
+    // Carrega backend em paralelo
+    Promise.all([carregarInbox(), carregarListas(), carregarHistorico()]).then(function(){
+      renderHome();
+    });
     renderCardapio();
-    // Se já tem cardápio escolhido em sessão anterior, vai pra lista direto
-    var telaInicial = STATE.telaAtiva || "cardapio";
+    var telaInicial = STATE.telaAtiva || "home";
+    var tempoSemEditar = STATE.ultimaEdicao ? (Date.now() - STATE.ultimaEdicao) : 0;
+    var SEIS_HORAS = 6 * 60 * 60 * 1000;
+    // Se passou mais de 6h sem edição E tem sessão em andamento, pergunta se retoma
+    if(tempoSemEditar > SEIS_HORAS && temSessaoAnterior() && telaInicial !== "cardapio"){
+      if(!perguntarRetomar()){
+        // Começa do zero
+        STATE.cardapioSel = {};
+        STATE.sugSelecionadas = {};
+        STATE.lista = {};
+        STATE.mercado = {};
+        salvarEstado();
+        showTela("cardapio");
+        renderCardapio();
+        return;
+      }
+    }
     if(telaInicial === "lista" || telaInicial === "mercado"){
       renderLista();
       if(telaInicial === "mercado") renderMercado();
       showTela(telaInicial);
-    } else if(telaInicial === "sugestoes"){
-      renderSugestoes();
-      showTela("sugestoes");
-    } else {
+    } else if(telaInicial === "inbox"){
+      renderInboxScreen();
+      showTela("inbox");
+    } else if(telaInicial === "cardapio" && STATE.tipoListaAtiva){
       showTela("cardapio");
+    } else {
+      showTela("home");
     }
   }).catch(function(err){
     console.error("Erro ao carregar dados:", err);
