@@ -269,6 +269,8 @@
     <div id="home-historico-content" style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);"></div>
     <div id="home-ultima" style="font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;margin-top:8px;text-align:center;"></div>
   </div>
+
+  <div id="home-versao" style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;text-align:center;padding:8px 20px 80px;opacity:.6;"></div>
 </div>
 
 <!-- ============ TELA INBOX ============ -->
@@ -357,6 +359,9 @@
         <div class="toggle-opt" data-vista="categoria" onclick="setVistaCardapio('categoria')">Por categoria</div>
       </div>
     </div>
+    <div class="search-wrap">
+      <input type="search" class="search-input" id="busca-cardapio" placeholder="Buscar prato..." oninput="renderCardapio()" autocomplete="off">
+    </div>
   </div>
   <div class="content" id="cardapio-content">
     <div class="loading"><div class="spinner"></div><div>carregando dados…</div></div>
@@ -424,6 +429,7 @@
       </div>
       <div style="display:flex;gap:6px;">
         <button class="btn-pular" onclick="voltarParaHome()" title="Voltar">← home</button>
+        <button class="btn-pular" onclick="copiarZap()" title="Copiar pro WhatsApp">📋</button>
         <button class="btn-pular" onclick="toggleRetrairSetores()" id="btn-retrair">⊟</button>
       </div>
     </div>
@@ -436,9 +442,8 @@
   <div class="footer">
     <div class="footer-info" id="mercado-info"></div>
     <div class="footer-btns">
-      <button class="btn btn-ghost" onclick="voltarParaLista()">←</button>
-      <button class="btn btn-ghost" onclick="copiarZap()" title="WhatsApp">📋</button>
-      <button class="btn btn-ghost" onclick="proximoMercado()" title="Salva e volta pra editar">→ próximo mercado</button>
+      <button class="btn btn-ghost" onclick="voltarParaLista()">← lista</button>
+      <button class="btn btn-ghost" onclick="proximoMercado()" title="Atualiza lista pra outro mercado">próximo mercado</button>
       <button class="btn btn-primary" onclick="finalizarCompra()">✓ Finalizar</button>
     </div>
   </div>
@@ -458,6 +463,9 @@ var CSV_URLS = {
 // Apps Script Web App — backend pra Inbox / Sessões / Histórico
 var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx661DRIobZg_fTFQeXnczAXJeF6DnWdt5fxM_WlU7xuXx3uVnO7RyXjPnRQEEfyXN8/exec";
 var APPS_SCRIPT_TOKEN = "mlist-x9k2-2026";
+
+// Versão do app — mostrada no rodapé da Home
+var APP_VERSION = "2.1.0";
 
 // Helpers de chamada ao Apps Script
 function apiGet(action, params){
@@ -530,6 +538,7 @@ var STATE = {
   vistaCardapio: "semana",
   itensCustom: [],
   colapsado: {},
+  colapsadoCat: {},   // categorias colapsadas na vista do cardápio (Por categoria)
   colapsadoSel: {},
   telaAtiva: "cardapio"
 };
@@ -676,11 +685,30 @@ function showTela(nome){
   STATE.telaAtiva = nome;
   salvarEstado();
   window.scrollTo(0, 0);
+  // Limpa todos os campos de busca ao trocar de tela (não mantém filtro stale)
+  ["busca","busca-inbox","busca-mercado","busca-cardapio"].forEach(function(id){
+    var el = document.getElementById(id);
+    if(el) el.value = "";
+  });
 }
 
 // ============================================================
 // TELA CARDÁPIO
 // ============================================================
+function toggleColapsoCat(cat){
+  STATE.colapsadoCat[cat] = !STATE.colapsadoCat[cat];
+  salvarEstado();
+  renderCardapio();
+}
+
+function toggleRetrairCardapio(){
+  var cats = ["Proteína","Fim de semana","Acompanhamento","Refogado jantar","Salada"];
+  var algumExpandido = cats.some(function(cat){ return !STATE.colapsadoCat[cat]; });
+  cats.forEach(function(cat){ STATE.colapsadoCat[cat] = algumExpandido; });
+  salvarEstado();
+  renderCardapio();
+}
+
 function setVistaCardapio(v){
   STATE.vistaCardapio = v;
   document.querySelectorAll(".toggle-opt").forEach(function(el){
@@ -747,6 +775,9 @@ function renderCardapio(){
       '<div class="loading"><div class="spinner"></div><div>carregando dados…</div></div>';
     return;
   }
+  var inpBusca = document.getElementById("busca-cardapio");
+  var busca = inpBusca ? (inpBusca.value || "").toLowerCase().trim() : "";
+  function pratoBate(p){ return !busca || p.toLowerCase().indexOf(busca) >= 0; }
   var html = "";
   if(STATE.vistaCardapio === "semana"){
     // Agrupado por mês × semana
@@ -758,8 +789,9 @@ function renderCardapio(){
     });
     Object.keys(semanas).forEach(function(k){
       var s = semanas[k];
-      var proteinas = s.pratos.filter(function(p){ return !isSalada(p); });
-      var saladas = s.pratos.filter(function(p){ return isSalada(p); });
+      var proteinas = s.pratos.filter(function(p){ return !isSalada(p) && pratoBate(p); });
+      var saladas = s.pratos.filter(function(p){ return isSalada(p) && pratoBate(p); });
+      if(busca && !proteinas.length && !saladas.length) return; // pula semana vazia em busca
       html += '<div class="sem-bloco">'
         +'<div class="sem-head">'
         +'<div class="sem-label">'+esc(s.mes)+' · '+esc(s.sem)+'</div>'
@@ -788,19 +820,31 @@ function renderCardapio(){
   } else {
     // Por categoria
     var cats = ["Proteína","Fim de semana","Acompanhamento","Refogado jantar","Salada"];
+    // Botão retrair tudo
+    var algumExpandido = cats.some(function(cat){
+      return DADOS.pratos.some(function(p){ return p.Categoria === cat && pratoBate(p.Prato); })
+        && !STATE.colapsadoCat[cat];
+    });
+    html += '<div style="text-align:right;margin:-4px 4px 8px;"><button class="sem-btn" onclick="toggleRetrairCardapio()">'
+      + (algumExpandido ? '⊟ retrair tudo' : '⊞ expandir tudo')
+      + '</button></div>';
     cats.forEach(function(cat){
-      var pratos = DADOS.pratos.filter(function(p){ return p.Categoria === cat; });
+      var pratos = DADOS.pratos.filter(function(p){ return p.Categoria === cat && pratoBate(p.Prato); });
       if(!pratos.length) return;
+      var coll = !!STATE.colapsadoCat[cat];
       html += '<div class="cat-bloco">'
-        +'<div class="cat-head"><span>'+esc(cat)+'</span><span>'+pratos.length+'</span></div>';
-      pratos.forEach(function(p){
-        var sel = !!STATE.cardapioSel[p.Prato];
-        html += '<div class="prato-row'+(sel?' selecionado':'')+(cat==='Salada'?' salada':'')+'" onclick="selecionarPrato(\''+esc(p.Prato).replace(/'/g,"\\'")+'\')">'
-          +'<div class="pr-check">'+(sel?'<svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 5l2 2 4-4"/></svg>':'')+'</div>'
-          +'<div class="pr-nome">'+esc(p.Prato)+'</div>'
-          +'<div class="pr-dif">'+getDificuldadeDePrato(p.Prato)+'</div>'
-          +'</div>';
-      });
+        +'<div class="cat-head" style="cursor:pointer;user-select:none;" onclick="toggleColapsoCat(\''+esc(cat)+'\')">'
+        +'<span>'+esc(cat)+'</span><span style="display:flex;align-items:center;gap:6px;"><span>'+pratos.length+'</span><span class="cat-chevron'+(coll?' collapsed':'')+'">▼</span></span></div>';
+      if(!coll){
+        pratos.forEach(function(p){
+          var sel = !!STATE.cardapioSel[p.Prato];
+          html += '<div class="prato-row'+(sel?' selecionado':'')+(cat==='Salada'?' salada':'')+'" onclick="selecionarPrato(\''+esc(p.Prato).replace(/'/g,"\\'")+'\')">'
+            +'<div class="pr-check">'+(sel?'<svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 5l2 2 4-4"/></svg>':'')+'</div>'
+            +'<div class="pr-nome">'+esc(p.Prato)+'</div>'
+            +'<div class="pr-dif">'+getDificuldadeDePrato(p.Prato)+'</div>'
+            +'</div>';
+        });
+      }
       html += '</div>';
     });
   }
@@ -988,14 +1032,28 @@ function renderLista(){
   var todos = todosItens().filter(function(it){
     return !busca || itemNome(it).toLowerCase().indexOf(busca) >= 0;
   });
-  // Considera "na lista" todos os itens com lista[nome].checked === true
+  // Separa em 3 grupos:
+  // - noLista: itens marcados (mostra agrupados por local)
+  // - fora: itens que pertencem ao tipo atual mas estão desmarcados (vermelho "Fora da lista")
+  // - catalogo: outros itens da fonte (cinza "Catálogo" — só visível com busca)
   var noLista = [];
   var fora = [];
+  var catalogo = [];
+  var tipoAtivo = STATE.tipoListaAtiva;
   todos.forEach(function(it){
     var nm = itemNome(it);
     var e = STATE.lista[nm];
-    if(e && e.checked) noLista.push(it);
-    else fora.push(it);
+    if(e && e.checked){ noLista.push(it); return; }
+    var tags = getTagsItem(it);
+    var ehManual = tags.indexOf("manual") >= 0;
+    var perteceAoTipo = false;
+    if(tipoAtivo === "semanal" && tags.indexOf("semanal") >= 0 && !ehManual) perteceAoTipo = true;
+    else if(tipoAtivo === "mensal" && tags.indexOf("mensal") >= 0 && !ehManual) perteceAoTipo = true;
+    // Tem badge do cardápio ou Inbox? Sempre pertence
+    var temBadge = e && ((e.fromPratos && e.fromPratos.length > 0) || (e.fromInbox && e.fromInbox.length > 0));
+    if(perteceAoTipo || temBadge) fora.push(it);
+    else if(emBusca) catalogo.push(it); // só aparece no Catálogo se há busca
+    // senão: não mostra (item incomum no contexto atual)
   });
   var mapaLocal = {};
   var ordemLocais = [];
@@ -1011,6 +1069,13 @@ function renderLista(){
   } else if(ehLivreVazia){
     html = '<div class="empty">Lista vazia ⚡<br><span style="font-size:13px;">Use o campo de busca acima pra adicionar itens.</span></div>';
   } else {
+    // Botão retrair tudo (só faz sentido quando há grupos)
+    if(ordemLocais.length > 1){
+      var algumExp = ordemLocais.some(function(loc){ return !STATE.colapsadoSel[loc]; });
+      html += '<div style="text-align:right;margin:-4px 4px 6px;"><button class="sem-btn" onclick="toggleRetrairLista()">'
+        + (algumExp ? '⊟ retrair tudo' : '⊞ expandir tudo')
+        + '</button></div>';
+    }
     ordemLocais.forEach(function(loc){
       var coll = !emBusca && !!STATE.colapsadoSel[loc];
       html += '<div class="cat-block">'
@@ -1099,10 +1164,45 @@ function renderLista(){
       }
       html += '</div>';
     }
+    // Bloco "Catálogo" (cinza) — só em busca, com items que não pertencem ao tipo atual
+    if(catalogo.length > 0){
+      html += '<div class="fora-block">'
+        +'<div class="fora-label catalogo-label">'
+        +'<span>Catálogo</span>'
+        +'<span style="font-weight:400;">'+catalogo.length+'</span>'
+        +'</div>';
+      catalogo.forEach(function(it){
+        var nm = itemNome(it);
+        html += '<div class="item catalogo" data-nome="'+esc(nm)+'">'
+          +'<div class="item-name"><span>'+esc(nm)+'</span>'
+          +'<span class="item-pratos" style="color:var(--text3);">'+esc(itemSetor(it))+'</span>'
+          +'</div>'
+          +(it.custom?'<span class="badge-novo">novo</span>':'')
+          +'<div class="qty-wrap"></div></div>';
+      });
+      html += '</div>';
+    }
   }
   document.getElementById("lista-content").innerHTML = html;
   atualizarFooterLista();
   bindListaEvents();
+}
+
+function toggleRetrairLista(){
+  // Pega todos os locais visíveis na lista atual
+  var locais = {};
+  todosItens().forEach(function(it){
+    var nm = itemNome(it);
+    if(STATE.lista[nm] && STATE.lista[nm].checked){
+      var loc = itemLocal(it) || "Outros";
+      locais[loc] = true;
+    }
+  });
+  var arr = Object.keys(locais);
+  var algumExp = arr.some(function(loc){ return !STATE.colapsadoSel[loc]; });
+  arr.forEach(function(loc){ STATE.colapsadoSel[loc] = algumExp; });
+  salvarEstado();
+  renderLista();
 }
 
 function bindListaEvents(){
@@ -1515,13 +1615,26 @@ function copiarZap(){
     txt += "\n\n*Não encontrado*\n";
     txt += naotm.map(function(it){ var nm = itemNome(it); var e = STATE.lista[nm]; return "• " + pad2(e.qty) + " - " + nm; }).join("\n");
   }
-  var btn = document.getElementById("btn-zap");
-  function ok(){ btn.textContent = "✓ Copiado!"; setTimeout(function(){ btn.textContent = "Copiar p/ WhatsApp"; }, 2500); }
+  function showToast(msg){
+    var t = document.createElement("div");
+    t.textContent = msg;
+    t.style.cssText = "position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--accent);color:var(--accent-fg);padding:10px 18px;border-radius:8px;font-size:14px;font-weight:500;z-index:500;font-family:'DM Sans',sans-serif;box-shadow:0 4px 12px rgba(0,0,0,.2);";
+    document.body.appendChild(t);
+    setTimeout(function(){ t.style.transition = "opacity .3s"; t.style.opacity = "0"; }, 1800);
+    setTimeout(function(){ document.body.removeChild(t); }, 2200);
+  }
+  function ok(){ showToast("✓ Copiado pro clipboard!"); }
   function fb(){
     var ta = document.createElement("textarea");
     ta.value = txt; ta.style.cssText = "position:fixed;top:0;left:0;opacity:0;";
     document.body.appendChild(ta); ta.focus(); ta.select();
-    try { document.execCommand("copy"); ok(); } catch(e){ alert(txt); }
+    try { document.execCommand("copy"); ok(); } catch(e){
+      confirmar({
+        titulo: "Texto da lista",
+        texto: txt,
+        opcoes: [{ label: "Ok", valor: true, estilo: "primario" }]
+      });
+    }
     document.body.removeChild(ta);
   }
   if(navigator.clipboard && navigator.clipboard.writeText){
@@ -2025,6 +2138,8 @@ function renderHome(){
     }
   }
   document.getElementById("home-historico-content").innerHTML = histHtml;
+  var elV = document.getElementById("home-versao");
+  if(elV) elV.textContent = "Mercado app · v" + APP_VERSION;
   atualizarIndicadorPerfil();
 }
 
@@ -2038,7 +2153,13 @@ function confirmarDeleteLista(id){
       { label: "Apagar", valor: true, estilo: "perigo" }
     ]
   }).then(function(ok){
-    if(ok) deletarListaSalva(id).then(renderHome);
+    if(ok){
+      // Otimista: remove da UI antes da API responder
+      STATE.listas = STATE.listas.filter(function(l){ return l.id !== id; });
+      salvarEstado();
+      renderHome();
+      deletarListaSalva(id).catch(function(err){ console.warn("erro apagar:", err.message); });
+    }
   });
 }
 
@@ -2089,17 +2210,23 @@ function renderInboxScreen(){
         +'<button class="ri-naotm" style="margin-left:8px;" onclick="confirmarRemoverInbox(\''+safeId+'\',\''+esc(it.item).replace(/\'/g,"\\\\'")+'\')" title="Remover">✕</button>'
         +'</div>';
     });
-    // Itens do catálogo: clique no item adiciona (sem botão +)
+    // Itens do catálogo — mesmo layout do Mercado (badge de setor + botão +)
     if(catalogoMatch.length){
-      html += '<div style="font-size:11px;color:var(--text3);font-family:\'DM Mono\',monospace;margin:14px 4px 6px;text-transform:uppercase;letter-spacing:.08em;">📋 toque pra adicionar</div>';
+      html += '<div class="fora-block">'
+        +'<div class="fora-label catalogo-label">'
+        +'<span>Catálogo</span>'
+        +'<span style="font-weight:400;">'+catalogoMatch.length+'</span>'
+        +'</div>';
       catalogoMatch.forEach(function(it){
         var nm = itemNome(it);
         var safeNm = esc(nm).replace(/\'/g,"\\\\'");
-        html += '<div class="item" onclick="addAoLembradosDoCatalogo(\''+safeNm+'\')" style="background:var(--surface2);cursor:pointer;">'
-          +'<div class="item-name"><span>'+esc(nm)+'</span>'
-          +'<span class="item-pratos" style="color:var(--text3);">'+esc(itemSetor(it))+'</span>'
-          +'</div></div>';
+        html += '<div class="resultado-item catalogo-item" onclick="addAoLembradosDoCatalogo(\''+safeNm+'\')">'
+          +'<span class="ri-setor-badge">'+esc(itemSetor(it))+'</span>'
+          +'<span class="ri-nome"><span>'+esc(nm)+'</span></span>'
+          +'<button class="ri-add" onclick="event.stopPropagation();addAoLembradosDoCatalogo(\''+safeNm+'\')" title="Adicionar">+</button>'
+          +'</div>';
       });
+      html += '</div>';
     }
   }
   document.getElementById("inbox-content").innerHTML = html;
@@ -2133,16 +2260,17 @@ function limparTodosLembrados(){
   }).then(function(ok){
     if(!ok) return;
     var ids = STATE.inbox.map(function(it){ return it.id; });
-    comLoading("Limpando " + ids.length + " itens…", removerItensDaInbox(ids)).then(renderInboxScreen);
+    removerItensDaInbox(ids); // background
+    renderInboxScreen();      // imediato
   });
 }
 
 function addAoLembradosDoCatalogo(nome){
-  comLoading("Adicionando…", adicionarItemAInbox(nome)).then(function(){
-    document.getElementById("busca-inbox").value = "";
-    document.getElementById("btn-add-inbox").classList.remove("visible");
-    renderInboxScreen();
-  });
+  // Otimista: já atualiza no STATE sincronamente, render imediato. API em background.
+  adicionarItemAInbox(nome);
+  document.getElementById("busca-inbox").value = "";
+  document.getElementById("btn-add-inbox").classList.remove("visible");
+  renderInboxScreen();
 }
 
 function confirmarRemoverInbox(id, nome){
@@ -2185,9 +2313,11 @@ function popularListaParaModo(tipo){
   var setoresSemanais = ["Hortifruti","Açougue","Setor de Frios","Padaria","Congelados","Laticínios"];
 
   // 1. Itens da fonte da verdade conforme tipo
+  // REGRA: itens com tag "manual" NÃO entram automaticamente — só via cardápio ou busca
   todosItens().forEach(function(it){
     var nm = itemNome(it);
     var tags = getTagsItem(it);
+    if(tags.indexOf("manual") >= 0) return; // pula manuais
     var entra = false;
     if(tipo === "semanal" && tags.indexOf("semanal") >= 0) entra = true;
     else if(tipo === "mensal" && tags.indexOf("mensal") >= 0) entra = true;
@@ -2195,15 +2325,16 @@ function popularListaParaModo(tipo){
     if(entra && !STATE.lista[nm]) STATE.lista[nm] = { qty: 1, checked: true, fromPratos: [], fromInbox: [] };
   });
 
-  // 2. Itens semanais dos pratos (cardápio) ganham badge
+  // 2. Itens dos pratos (cardápio) — só os com tag "semanal" entram automático com badge
+  // REGRA: cardápio só popula a lista com ingredientes que tem tag "semanal"
   pratosSel.forEach(function(prato){
     getReceitaDoPrato(prato).forEach(function(r){
       var ing = r.Ingrediente;
       if(!ing || TEMPEROS_UNIVERSAIS.has(ing)) return;
       var item = getItemByNome(ing);
       if(!item) return;
-      var setor = itemSetor(item);
-      if(setoresSemanais.indexOf(setor) < 0) return;
+      var ingTags = getTagsItem(item);
+      if(ingTags.indexOf("semanal") < 0) return; // só ingredientes semanais entram via cardápio
       if(!STATE.lista[ing]) STATE.lista[ing] = { qty: 1, checked: true, fromPratos: [], fromInbox: [] };
       if(!STATE.lista[ing].fromPratos) STATE.lista[ing].fromPratos = [];
       if(STATE.lista[ing].fromPratos.indexOf(prato) < 0) STATE.lista[ing].fromPratos.push(prato);
@@ -2285,7 +2416,7 @@ function _coletarIdsInboxNaoEncontrados(){
 }
 
 function salvarESair(){
-  salvarListaAtiva().then(function(){
+  comLoading("Salvando lista…", salvarListaAtiva()).then(function(){
     _sairParaHome();
   }).catch(function(err){
     alert("Erro ao salvar: " + (err.message || err));
@@ -2310,7 +2441,6 @@ function proximoMercado(){
   }).then(function(ok){
     if(!ok) return;
     var idsComprados = _coletarIdsInboxComprados();
-    removerItensDaInbox(idsComprados);
     feitos.forEach(function(it){
       var nm = itemNome(it);
       if(STATE.lista[nm]) STATE.lista[nm].checked = false;
@@ -2320,10 +2450,13 @@ function proximoMercado(){
       var nm = itemNome(it);
       if(STATE.mercado[nm]) STATE.mercado[nm].naoTem = false;
     });
-    salvarListaAtiva().finally(function(){
-      // Volta pra Lista pra continuar editando antes de ir pro próximo mercado
-      showTela("lista");
-      renderLista();
+    salvarEstado();
+    // Continua na tela Mercado, só atualiza
+    comLoading("Salvando…", Promise.all([
+      removerItensDaInbox(idsComprados),
+      salvarListaAtiva()
+    ])).then(function(){
+      renderMercado();
     });
   });
 }
@@ -2370,7 +2503,7 @@ function _executarFinalizacao(feitos, naoEnc, pendentes, pra_inbox){
     };
   });
 
-  apiPost("finalizarLista", {
+  var apiPromise = apiPost("finalizarLista", {
     id: STATE.listaAtivaId,
     dados: {
       autor: STATE.perfil || "?",
@@ -2389,8 +2522,10 @@ function _executarFinalizacao(feitos, naoEnc, pendentes, pra_inbox){
         pendentes: pendentes.map(function(it){ return itemNome(it); })
       }
     }
-  }).then(function(){
-    // recarrega caches
+  });
+
+  // Background — não bloqueia UI
+  apiPromise.then(function(){
     return Promise.all([carregarInbox(), carregarListas(), carregarHistorico()]);
   }).catch(function(err){
     console.warn("Erro ao finalizar:", err.message);
