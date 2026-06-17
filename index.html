@@ -69,6 +69,7 @@
 
   .item{display:flex;align-items:center;gap:12px;padding:13px 12px;border-radius:var(--radius-sm);cursor:pointer;user-select:none;border:1px solid var(--border);background:var(--surface);margin-bottom:2px;touch-action:pan-y;}
   .item.from-prato{background:var(--orange-bg);border-color:var(--orange-border);}
+  .item.from-import{background:#F0F1FF;border-color:#C7CBF5;}
   .item.desmarcado{background:var(--red-bg);border-color:var(--red-border);}
   .item.catalogo{background:var(--surface2);border-color:var(--border);opacity:.95;}
   .item.catalogo .item-name>span:first-child{color:var(--text2);}
@@ -199,6 +200,8 @@
 
   /* Badge do autor da Inbox */
   .ri-autor, .item-autor{font-size:9px;font-family:'DM Mono',monospace;background:#E1F5EE;color:#0F6E56;border-radius:4px;padding:1px 5px;margin-right:3px;}
+  /* Badge de item importado (colado do WhatsApp) */
+  .item-importado{font-size:9px;font-family:'DM Mono',monospace;background:#E7E9FF;color:#3D43B8;border-radius:4px;padding:1px 5px;margin-right:3px;}
 
   /* Trocar perfil */
   .perfil-link{font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;text-decoration:underline;cursor:pointer;background:none;border:none;padding:0;}
@@ -255,6 +258,11 @@
         <span class="ic">⚡</span>
         <span class="lb">Lista Livre</span>
         <span class="sub">opcional: incluir Lembrados</span>
+      </button>
+      <button class="home-nova-btn" onclick="colarDireto()">
+        <span class="ic">📋</span>
+        <span class="lb">Importar do WhatsApp</span>
+        <span class="sub">cola um texto e vira lista</span>
       </button>
     </div>
   </div>
@@ -381,13 +389,16 @@
   <div class="header">
     <div class="header-top">
       <div>
-        <div class="header-title" id="lista-title">Minha Lista</div>
+        <div class="header-title" id="lista-title" style="cursor:pointer;" onclick="renomearLista()" title="Toque pra renomear">Minha Lista</div>
         <div class="header-sub" id="lista-sub">
           <button class="perfil-link" onclick="trocarPerfil()">👤 <span data-perfil-label>?</span></button>
           · toque para retirar
         </div>
       </div>
-      <button class="btn-pular" onclick="voltarParaHome()" title="Voltar">← home</button>
+      <div style="display:flex;gap:6px;align-items:flex-start;">
+        <button class="btn-pular" onclick="colarNaListaAtual()" title="Colar itens do WhatsApp na lista">📋 colar</button>
+        <button class="btn-pular" onclick="voltarParaHome()" title="Voltar">← home</button>
+      </div>
     </div>
     <div id="banner-cardapio-container"></div>
     <div class="search-wrap">
@@ -409,8 +420,8 @@
 <!-- ============ MODAL ============ -->
 <div class="modal-overlay" id="modal" onclick="fecharModalFora(event)">
   <div class="modal">
-    <h3>Colar lista do WhatsApp</h3>
-    <p>Cole abaixo o texto copiado anteriormente.</p>
+    <h3 id="modal-h3">Colar lista do WhatsApp</h3>
+    <p id="modal-p">Cole abaixo o texto copiado anteriormente.</p>
     <textarea id="modal-texto" placeholder="Cole aqui a lista..."></textarea>
     <div class="modal-btns">
       <button class="btn btn-ghost" onclick="fecharModal()">Cancelar</button>
@@ -465,7 +476,7 @@ var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx661DRIobZg_fTFQ
 var APPS_SCRIPT_TOKEN = "mlist-x9k2-2026";
 
 // Versão do app — mostrada no rodapé da Home
-var APP_VERSION = "2.1.0";
+var APP_VERSION = "2.2.0";
 
 // Helpers de chamada ao Apps Script
 function apiGet(action, params){
@@ -785,35 +796,34 @@ function renderCardapio(){
     DADOS.cardapio.forEach(function(c){
       var key = c["Mês"] + "·" + c.Semana;
       if(!semanas[key]) semanas[key] = { mes: c["Mês"], sem: c.Semana, pratos: [] };
-      semanas[key].pratos.push(c.Prato);
+      semanas[key].pratos.push({ nome: c.Prato, papel: (c.Papel||"").trim() });
     });
+    function checkSvg_(sel){ return sel?'<svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 5l2 2 4-4"/></svg>':''; }
+    function pratoRow_(nome, comDif){
+      var sel = !!STATE.cardapioSel[nome];
+      return '<div class="prato-row'+(comDif?'':' salada')+(sel?' selecionado':'')+'" onclick="selecionarPrato(\''+esc(nome).replace(/'/g,"\\'")+'\')">'
+        +'<div class="pr-check">'+checkSvg_(sel)+'</div>'
+        +'<div class="pr-nome">'+esc(nome)+'</div>'
+        +(comDif?'<div class="pr-dif">'+getDificuldadeDePrato(nome)+'</div>':'')
+        +'</div>';
+    }
+    // guarnição = qualquer Papel preenchido; fallback p/ CSV antigo via categoria Salada
+    function ehGuarnicao_(p){ return p.papel ? true : isSalada(p.nome); }
     Object.keys(semanas).forEach(function(k){
       var s = semanas[k];
-      var proteinas = s.pratos.filter(function(p){ return !isSalada(p) && pratoBate(p); });
-      var saladas = s.pratos.filter(function(p){ return isSalada(p) && pratoBate(p); });
-      if(busca && !proteinas.length && !saladas.length) return; // pula semana vazia em busca
+      var vis = s.pratos.filter(function(p){ return pratoBate(p.nome); });
+      if(busca && !vis.length) return; // pula semana vazia em busca
+      var proteinas  = vis.filter(function(p){ return !ehGuarnicao_(p); });
+      var guarnicoes = vis.filter(function(p){ return  ehGuarnicao_(p); });
       html += '<div class="sem-bloco">'
         +'<div class="sem-head">'
         +'<div class="sem-label">'+esc(s.mes)+' · '+esc(s.sem)+'</div>'
         +'<button class="sem-btn" onclick="marcarSemanaTodos(\''+esc(s.mes)+'\',\''+esc(s.sem)+'\')">+ marcar tudo</button>'
         +'</div>';
-      proteinas.forEach(function(p){
-        var sel = !!STATE.cardapioSel[p];
-        html += '<div class="prato-row'+(sel?' selecionado':'')+'" onclick="selecionarPrato(\''+esc(p).replace(/'/g,"\\'")+'\')">'
-          +'<div class="pr-check">'+(sel?'<svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 5l2 2 4-4"/></svg>':'')+'</div>'
-          +'<div class="pr-nome">'+esc(p)+'</div>'
-          +'<div class="pr-dif">'+getDificuldadeDePrato(p)+'</div>'
-          +'</div>';
-      });
-      if(saladas.length){
-        html += '<div class="salada-label">saladas da semana</div>';
-        saladas.forEach(function(p){
-          var sel = !!STATE.cardapioSel[p];
-          html += '<div class="prato-row salada'+(sel?' selecionado':'')+'" onclick="selecionarPrato(\''+esc(p).replace(/'/g,"\\'")+'\')">'
-            +'<div class="pr-check">'+(sel?'<svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 5l2 2 4-4"/></svg>':'')+'</div>'
-            +'<div class="pr-nome">'+esc(p)+'</div>'
-            +'</div>';
-        });
+      proteinas.forEach(function(p){ html += pratoRow_(p.nome, true); });
+      if(guarnicoes.length){
+        html += '<div class="salada-label">guarnições da semana</div>';
+        guarnicoes.forEach(function(p){ html += pratoRow_(p.nome, false); });
       }
       html += '</div>';
     });
@@ -1092,10 +1102,12 @@ function renderLista(){
           var k = chave(nm);
           var hasPratos = e.fromPratos && e.fromPratos.length > 0;
           var hasInbox = e.fromInbox && e.fromInbox.length > 0;
-          html += '<div class="item'+(hasPratos||hasInbox?' from-prato':'')+'" data-nome="'+esc(nm)+'">'
+          var hasImport = !!e.fromImport;
+          var itemCls = (hasPratos||hasInbox) ? ' from-prato' : (hasImport ? ' from-import' : '');
+          html += '<div class="item'+itemCls+'" data-nome="'+esc(nm)+'">'
             +'<div class="item-name">'
             +'<span>'+esc(nm)+'</span>';
-          if(hasPratos || hasInbox){
+          if(hasPratos || hasInbox || hasImport){
             html += '<span class="item-pratos">';
             if(hasInbox){
               var autores = {};
@@ -1103,6 +1115,9 @@ function renderLista(){
               Object.keys(autores).forEach(function(a){
                 html += '<span class="item-autor">📥 '+esc(a)+'</span>';
               });
+            }
+            if(hasImport){
+              html += '<span class="item-importado">📋 importado</span>';
             }
             if(hasPratos){
               html += e.fromPratos.map(function(p){ return '<span class="pp-badge">'+esc(p)+'</span>'; }).join('');
@@ -1141,16 +1156,20 @@ function renderLista(){
           var e = STATE.lista[nm] || {};
           var hasPratos = e.fromPratos && e.fromPratos.length > 0;
           var hasInbox = e.fromInbox && e.fromInbox.length > 0;
+          var hasImport = !!e.fromImport;
           // Lista Livre: items "fora" são do catálogo (cinza claro), não vermelho
           var classeFora = ehLivre ? "catalogo" : "desmarcado";
           html += '<div class="item '+classeFora+'" data-nome="'+esc(nm)+'">'
             +'<div class="item-name"><span>'+esc(nm)+'</span>';
-          if(hasPratos || hasInbox){
+          if(hasPratos || hasInbox || hasImport){
             html += '<span class="item-pratos">';
             if(hasInbox){
               var autores = {};
               e.fromInbox.forEach(function(x){ if(x.autor) autores[x.autor] = true; });
               Object.keys(autores).forEach(function(a){ html += '<span class="item-autor">📥 '+esc(a)+'</span>'; });
+            }
+            if(hasImport){
+              html += '<span class="item-importado">📋 importado</span>';
             }
             if(hasPratos){
               html += e.fromPratos.map(function(p){ return '<span class="pp-badge">'+esc(p)+'</span>'; }).join('');
@@ -1670,17 +1689,36 @@ function atualizarDados(){
 }
 
 // ============================================================
-// COLAR LISTA DO WHATSAPP (fallback de persistência entre dispositivos)
+// COLAR / IMPORTAR LISTA DO WHATSAPP
+//  - "nova":   cria uma lista livre nomeável e salvável (a partir do texto)
+//  - "append": cola itens DENTRO da lista que já está aberta
 // ============================================================
-function colarDireto(){
+var _modoImport = "nova"; // "nova" | "append"
+
+// Abre a Home/clipboard pra importar como NOVA lista
+function colarDireto(){ _abrirImport("nova"); }
+// Cola itens na lista aberta (botão "📋 colar" da tela de lista)
+function colarNaListaAtual(){ _abrirImport("append"); }
+
+function _abrirImport(modo){
+  _modoImport = modo;
   if(navigator.clipboard && navigator.clipboard.readText){
     navigator.clipboard.readText()
-      .then(function(txt){ if(!txt.trim()){ abrirModal(); return; } processarTexto(txt); })
+      .then(function(txt){ if(txt && txt.trim()){ _despacharImport(txt); } else { abrirModal(); } })
       .catch(abrirModal);
   } else { abrirModal(); }
 }
 function abrirModal(){
   document.getElementById("modal-texto").value = "";
+  var h = document.getElementById("modal-h3");
+  var p = document.getElementById("modal-p");
+  if(_modoImport === "append"){
+    if(h) h.textContent = "Colar itens na lista";
+    if(p) p.textContent = "Os itens colados serão adicionados à lista atual.";
+  } else {
+    if(h) h.textContent = "Importar lista do WhatsApp";
+    if(p) p.textContent = "Cole o texto da lista. Vira uma lista nova, que você nomeia e salva.";
+  }
   document.getElementById("modal").classList.add("open");
 }
 function fecharModal(){ document.getElementById("modal").classList.remove("open"); }
@@ -1689,16 +1727,38 @@ function importarColado(){
   var txt = document.getElementById("modal-texto").value;
   if(!txt.trim()){ alert("Cole o texto primeiro."); return; }
   fecharModal();
-  processarTexto(txt);
+  _despacharImport(txt);
 }
-function processarTexto(txt){
-  // Reseta lista: tudo desmarcado, vai marcar só o que veio no texto
-  Object.keys(STATE.lista).forEach(function(k){ STATE.lista[k].checked = false; });
-  var lines = txt.split("\n");
+function _despacharImport(txt){
+  if(_modoImport === "append") _colarNaListaAtual(txt);
+  else importarComoNovaLista(txt);
+}
+
+// Cabeçalho de setor do WhatsApp em negrito, ex: "*Hortifruti*" — não é item
+function _ehCabecalhoSetor(t){ return /^\*[^*]+\*$/.test(t); }
+
+// Conta quantas linhas dá pra reconhecer como item (sem alterar estado)
+function _contarItensTexto(txt){
+  var n = 0;
+  (txt || "").split("\n").forEach(function(line){
+    var t = line.trim();
+    if(_ehCabecalhoSetor(t)) return;
+    if(/^[•\-*]\s*(?:\d+\s*-\s*)?.+$/.test(t)) n++;
+  });
+  return n;
+}
+
+// Faz o parse do texto e ADICIONA os itens em STATE.lista.
+// Não mexe na identidade da lista. Retorna { found, naoReconhecidos }.
+function _parseTextoParaLista(txt){
+  var lines = (txt || "").split("\n");
   var found = 0, naoReconhecidos = [];
   lines.forEach(function(line){
+    var t = line.trim();
+    // Ignora cabeçalho de setor do WhatsApp (ex: "*Hortifruti*")
+    if(_ehCabecalhoSetor(t)) return;
     // Formato: "• 02 - Tomate" ou "- 02 - Tomate" ou "* Tomate"
-    var m = line.match(/^[•\-*]\s*(?:(\d+)\s*-\s*)?(.+)$/);
+    var m = t.match(/^[•\-*]\s*(?:(\d+)\s*-\s*)?(.+)$/);
     if(!m) return;
     var qty = m[1] ? parseInt(m[1], 10) : 1;
     var nome = m[2].trim();
@@ -1712,26 +1772,94 @@ function processarTexto(txt){
       if(!STATE.lista[nm]) STATE.lista[nm] = { qty: qty, checked: true, fromPratos: [] };
       else { STATE.lista[nm].checked = true; STATE.lista[nm].qty = qty; }
       if(corte) STATE.lista[nm].corteEscolhido = corte;
+      STATE.lista[nm].fromImport = true;
       found++;
     } else {
       // Item não está na fonte da verdade — cria custom
       var novo = { "Nome do Item": nome, "Local em Casa": "Outros", "Setor no Mercado": "Outros", "Cortes": "", custom: true };
       STATE.itensCustom.push(novo);
-      STATE.lista[nome] = { qty: qty, checked: true, fromPratos: [] };
+      STATE.lista[nome] = { qty: qty, checked: true, fromPratos: [], fromImport: true };
       naoReconhecidos.push(nome);
       found++;
     }
   });
-  salvarEstado();
-  if(found){
+  return { found: found, naoReconhecidos: naoReconhecidos };
+}
+
+// Importa o texto como uma NOVA lista livre (nomeável e salvável na Home)
+function importarComoNovaLista(txt){
+  if(STATE.listas.length >= 5){
+    alert("Limite de 5 listas salvas atingido. Apague ou finalize alguma primeiro.");
+    return;
+  }
+  if(!STATE.perfil){ trocarPerfil(); return; }
+  var previa = _contarItensTexto(txt);
+  if(!previa){
+    alert("Nenhum item reconhecido no texto.\nFormato esperado: • 02 - Tomate");
+    return;
+  }
+  pedir({
+    titulo: "Nome da lista",
+    texto: previa + " itens encontrados. Dê um nome pra essa lista importada.",
+    placeholder: "ex: Compras da semana, Churrasco…",
+    valorPadrao: "Importada " + new Date().toLocaleDateString("pt-BR")
+  }).then(function(r){
+    if(!r) return; // cancelado
+    // Monta uma lista livre nova, do zero
+    STATE.listaAtivaId = null;
+    STATE.tipoListaAtiva = "livre";
+    STATE.nomeListaAtiva = (r.texto || "").trim();
+    STATE.incluiInbox = false;
+    _limparEstadoLista();
+    var res = _parseTextoParaLista(txt);
+    salvarEstado();
     renderLista();
     showTela("lista");
-    var aviso = found + " itens carregados";
-    if(naoReconhecidos.length) aviso += " (" + naoReconhecidos.length + " novos adicionados ao catálogo)";
+    var aviso = res.found + " itens importados";
+    if(res.naoReconhecidos.length) aviso += " (" + res.naoReconhecidos.length + " novos no catálogo)";
+    aviso += ".\nToque em 💾 salvar pra guardar a lista na Home.";
     alert(aviso);
-  } else {
-    alert("Nenhum item reconhecido no texto.\nFormato esperado: • 02 - Tomate");
+  });
+}
+
+// Cola itens DENTRO da lista que já está aberta (append, sem resetar)
+function _colarNaListaAtual(txt){
+  if(!STATE.tipoListaAtiva && !STATE.listaAtivaId){
+    // Sem lista aberta: cai pro fluxo de lista nova
+    importarComoNovaLista(txt);
+    return;
   }
+  var res = _parseTextoParaLista(txt);
+  if(!res.found){
+    alert("Nenhum item reconhecido no texto.\nFormato esperado: • 02 - Tomate");
+    return;
+  }
+  salvarEstado();
+  renderLista();
+  var aviso = res.found + " itens adicionados à lista";
+  if(res.naoReconhecidos.length) aviso += " (" + res.naoReconhecidos.length + " novos no catálogo)";
+  alert(aviso);
+}
+
+// Renomeia a lista ativa (título clicável na tela de lista)
+function renomearLista(){
+  if(!STATE.tipoListaAtiva && !STATE.listaAtivaId) return;
+  pedir({
+    titulo: "Nome da lista",
+    texto: "Como você quer chamar esta lista?",
+    placeholder: "ex: Compras da semana…",
+    valorPadrao: STATE.nomeListaAtiva || ""
+  }).then(function(r){
+    if(!r) return;
+    STATE.nomeListaAtiva = (r.texto || "").trim();
+    salvarEstado();
+    renderLista();
+  });
+}
+
+// (compat) mantido caso algo ainda chame processarTexto: trata como lista nova
+function processarTexto(txt){
+  importarComoNovaLista(txt);
 }
 
 // ============================================================
